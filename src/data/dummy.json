@@ -1,0 +1,406 @@
+{
+  "brands": [
+    { "id": "b1", "brand_name": "던에드워드", "website": "https://www.dunnedwards.com" },
+    { "id": "b2", "brand_name": "벤자민무어", "website": "https://www.benjaminmoore.com" },
+    { "id": "b3", "brand_name": "LG하우시스", "website": "https://www.lghausys.co.kr" },
+    { "id": "b4", "brand_name": "동화자연마루", "website": "https://www.dongwha.com" },
+    { "id": "b5", "brand_name": "대림바스", "website": "https://www.daelimbath.com" },
+    { "id": "b6", "brand_name": "아메리칸스탠다드", "website": "https://www.americanstandard.com" },
+    { "id": "b7", "brand_name": "필립스", "website": "https://www.philips.co.kr" },
+    { "id": "b8", "brand_name": "오스람", "website": "https://www.osram.co.kr" },
+    { "id": "b9", "brand_name": "이건마루", "website": "https://www.egflooring.com" },
+    { "id": "b10", "brand_name": "삼화페인트", "website": "https://www.samhwapaints.co.kr" }
+  ],
+  "materials": [
+    {
+      "id": "m1",
+      "brand_id": "b1",
+      "name": "에코-프렌들리 무광 페인트",
+      "model_number": "DE-ECO-5520",
+      "cat_1": "Material",
+      "cat_2": "Paint",
+      "thumb_url": null,
+      "color": "오이스터 화이트",
+      "finish": "무광(Matte)",
+      "unit": "18L",
+      "price_per_unit": 85000,
+      "vendors": ["v1", "v2"]
+    },
+    {
+      "id": "m2",
+      "brand_id": "b2",
+      "name": "클래식 새틴 페인트",
+      "model_number": "BM-OC-17",
+      "cat_1": "Material",
+      "cat_2": "Paint",
+      "thumb_url": null,
+      "color": "화이트 도브",
+      "finish": "새틴(Satin)",
+      "unit": "18L",
+      "price_per_unit": 110000,
+      "vendors": ["v1"]
+    },
+    {
+      "id": "m3",
+      "brand_id": "b3",
+      "name": "지아소 포세린 타일",
+      "model_number": "LG-PT-600",
+      "cat_1": "Material",
+      "cat_2": "Tile",
+      "thumb_url": null,
+      "color": "라이트 그레이",
+      "finish": "무광",
+      "unit": "600x600mm",
+      "price_per_unit": 28000,
+      "vendors": ["v3", "v4"]
+    },
+    {
+      "id": "m4",
+      "brand_id": "b3",
+      "name": "마블 패턴 대형 타일",
+      "model_number": "LG-MT-900",
+      "cat_1": "Material",
+      "cat_2": "Tile",
+      "thumb_url": null,
+      "color": "크림 화이트",
+      "finish": "유광",
+      "unit": "900x1800mm",
+      "price_per_unit": 65000,
+      "vendors": ["v3"]
+    },
+    {
+      "id": "m5",
+      "brand_id": "b4",
+      "name": "자연무늬목 원목마루",
+      "model_number": "DW-OAK-120",
+      "cat_1": "Material",
+      "cat_2": "Floor",
+      "thumb_url": null,
+      "color": "내추럴 오크",
+      "finish": "UV코팅",
+      "unit": "120x900mm",
+      "price_per_unit": 45000,
+      "vendors": ["v5"]
+    },
+    {
+      "id": "m6",
+      "brand_id": "b9",
+      "name": "강마루 프리미엄 시리즈",
+      "model_number": "EG-PRIME-150",
+      "cat_1": "Material",
+      "cat_2": "Floor",
+      "thumb_url": null,
+      "color": "그레이 워시",
+      "finish": "엠보싱",
+      "unit": "150x900mm",
+      "price_per_unit": 38000,
+      "vendors": ["v5", "v6"]
+    },
+    {
+      "id": "m7",
+      "brand_id": "b3",
+      "name": "프리미엄 실크 벽지",
+      "model_number": "LG-WP-SILK-02",
+      "cat_1": "Material",
+      "cat_2": "Wallpaper",
+      "thumb_url": null,
+      "color": "아이보리",
+      "finish": "실크",
+      "unit": "1롤(53cm×10m)",
+      "price_per_unit": 32000,
+      "vendors": ["v2", "v6"]
+    },
+    {
+      "id": "m8",
+      "brand_id": "b5",
+      "name": "로얄 원피스 양변기",
+      "model_number": "DB-ROYAL-700",
+      "cat_1": "Sanitary",
+      "cat_2": "Toilet",
+      "thumb_url": null,
+      "color": "글로시 화이트",
+      "finish": "도기",
+      "unit": "EA",
+      "price_per_unit": 380000,
+      "vendors": ["v7"]
+    },
+    {
+      "id": "m9",
+      "brand_id": "b6",
+      "name": "스탠다드 욕조",
+      "model_number": "AS-TUB-1600",
+      "cat_1": "Sanitary",
+      "cat_2": "Bathtub",
+      "thumb_url": null,
+      "color": "화이트",
+      "finish": "아크릴",
+      "unit": "1600x800mm",
+      "price_per_unit": 650000,
+      "vendors": ["v7", "v8"]
+    },
+    {
+      "id": "m10",
+      "brand_id": "b6",
+      "name": "세면대 일체형 세트",
+      "model_number": "AS-BASIN-550",
+      "cat_1": "Sanitary",
+      "cat_2": "Basin",
+      "thumb_url": null,
+      "color": "화이트",
+      "finish": "도기",
+      "unit": "550x450mm",
+      "price_per_unit": 220000,
+      "vendors": ["v7"]
+    },
+    {
+      "id": "m11",
+      "brand_id": "b7",
+      "name": "HUE 스마트 LED 다운라이트",
+      "model_number": "PH-HUE-DL-6",
+      "cat_1": "Lighting",
+      "cat_2": "Downlight",
+      "thumb_url": null,
+      "color": "화이트",
+      "finish": "알루미늄",
+      "unit": "EA",
+      "price_per_unit": 58000,
+      "vendors": ["v9"]
+    },
+    {
+      "id": "m12",
+      "brand_id": "b8",
+      "name": "LED 팬던트 조명",
+      "model_number": "OS-PDT-120",
+      "cat_1": "Lighting",
+      "cat_2": "Pendant",
+      "thumb_url": null,
+      "color": "블랙 매트",
+      "finish": "철재",
+      "unit": "EA",
+      "price_per_unit": 145000,
+      "vendors": ["v9", "v10"]
+    },
+    {
+      "id": "m13",
+      "brand_id": "b10",
+      "name": "외부용 발수 페인트",
+      "model_number": "SH-EXT-WP-20",
+      "cat_1": "Material",
+      "cat_2": "Paint",
+      "thumb_url": null,
+      "color": "라이트 샌드",
+      "finish": "반광",
+      "unit": "18L",
+      "price_per_unit": 75000,
+      "vendors": ["v1", "v2"]
+    },
+    {
+      "id": "m14",
+      "brand_id": "b3",
+      "name": "욕실용 모자이크 타일",
+      "model_number": "LG-MOS-48",
+      "cat_1": "Material",
+      "cat_2": "Tile",
+      "thumb_url": null,
+      "color": "그린 믹스",
+      "finish": "무광",
+      "unit": "300x300mm(시트)",
+      "price_per_unit": 18000,
+      "vendors": ["v3", "v4"]
+    }
+  ],
+  "vendors": [
+    {
+      "id": "v1",
+      "company_name": "한성도장",
+      "specialty": "Paint",
+      "address": "서울시 강동구 천호대로 123",
+      "phone": "02-1234-5678",
+      "email": "info@hansung-paint.co.kr",
+      "note": "외부/내부 도장 전문. 아파트 대단지 시공 경험 풍부.",
+      "contacts": [
+        { "id": "c1", "vendor_id": "v1", "name": "김철수", "role": "영업팀장", "phone": "010-1234-5678", "email": "kim@hansung.co.kr" },
+        { "id": "c2", "vendor_id": "v1", "name": "이영희", "role": "현장소장", "phone": "010-2345-6789", "email": "lee@hansung.co.kr" }
+      ]
+    },
+    {
+      "id": "v2",
+      "company_name": "서울페인팅",
+      "specialty": "Paint",
+      "address": "서울시 성동구 왕십리로 45",
+      "phone": "02-9876-5432",
+      "email": "contact@seoul-painting.com",
+      "note": "소규모 공간 특화. 특수 도장(금속, 콘크리트 노출) 가능.",
+      "contacts": [
+        { "id": "c3", "vendor_id": "v2", "name": "박민준", "role": "대표", "phone": "010-3456-7890", "email": "park@seoul-painting.com" }
+      ]
+    },
+    {
+      "id": "v3",
+      "company_name": "대성타일",
+      "specialty": "Tile",
+      "address": "경기도 성남시 중원구 상대원동 56",
+      "phone": "031-456-7890",
+      "email": "sales@daesung-tile.co.kr",
+      "note": "대형 포세린 타일 전문 공급. 수입 타일 취급.",
+      "contacts": [
+        { "id": "c4", "vendor_id": "v3", "name": "최동훈", "role": "영업이사", "phone": "010-4567-8901", "email": "choi@daesung.co.kr" },
+        { "id": "c5", "vendor_id": "v3", "name": "정수진", "role": "영업담당", "phone": "010-5678-9012", "email": "jung@daesung.co.kr" }
+      ]
+    },
+    {
+      "id": "v4",
+      "company_name": "현대타일&스톤",
+      "specialty": "Tile",
+      "address": "서울시 중구 을지로 77",
+      "phone": "02-2222-3333",
+      "email": "hd@hdtile.co.kr",
+      "note": "천연석 및 모자이크 타일 전문. 시공팀 보유.",
+      "contacts": [
+        { "id": "c6", "vendor_id": "v4", "name": "강현우", "role": "소장", "phone": "010-6789-0123", "email": "kang@hdtile.co.kr" }
+      ]
+    },
+    {
+      "id": "v5",
+      "company_name": "미래마루",
+      "specialty": "Floor",
+      "address": "경기도 광주시 오포읍 능평로 200",
+      "phone": "031-777-8888",
+      "email": "order@mirae-floor.com",
+      "note": "원목마루/강마루 전문 유통 및 시공. 자체 보유 재고 대량 가능.",
+      "contacts": [
+        { "id": "c7", "vendor_id": "v5", "name": "윤석호", "role": "이사", "phone": "010-7890-1234", "email": "yoon@mirae-floor.com" },
+        { "id": "c8", "vendor_id": "v5", "name": "한지은", "role": "CS담당", "phone": "010-8901-2345", "email": "han@mirae-floor.com" }
+      ]
+    },
+    {
+      "id": "v6",
+      "company_name": "인테리어플러스",
+      "specialty": "Floor",
+      "address": "서울시 용산구 한강대로 301",
+      "phone": "02-5555-6666",
+      "email": "info@interior-plus.kr",
+      "note": "바닥재+벽지 복합 시공 가능. 강남권 레퍼런스 다수.",
+      "contacts": [
+        { "id": "c9", "vendor_id": "v6", "name": "임성훈", "role": "팀장", "phone": "010-9012-3456", "email": "lim@interior-plus.kr" }
+      ]
+    },
+    {
+      "id": "v7",
+      "company_name": "대림바스공사",
+      "specialty": "Sanitary",
+      "address": "서울시 강남구 논현로 148",
+      "phone": "02-3333-4444",
+      "email": "bath@daelim-const.co.kr",
+      "note": "위생도기 전문 시공. 욕실 리모델링 원스톱 서비스.",
+      "contacts": [
+        { "id": "c10", "vendor_id": "v7", "name": "조민석", "role": "소장", "phone": "010-0123-4567", "email": "jo@daelim-const.co.kr" },
+        { "id": "c11", "vendor_id": "v7", "name": "권지영", "role": "영업", "phone": "010-1122-3344", "email": "kwon@daelim-const.co.kr" }
+      ]
+    },
+    {
+      "id": "v8",
+      "company_name": "청정욕실",
+      "specialty": "Sanitary",
+      "address": "경기도 부천시 원미구 중동 88",
+      "phone": "032-111-2222",
+      "email": "clean@cleanroom.co.kr",
+      "note": "수입 욕실 제품 전문 취급. 럭셔리 라인 가능.",
+      "contacts": [
+        { "id": "c12", "vendor_id": "v8", "name": "신지훈", "role": "대표", "phone": "010-2233-4455", "email": "shin@cleanroom.co.kr" }
+      ]
+    },
+    {
+      "id": "v9",
+      "company_name": "루미나이트",
+      "specialty": "Lighting",
+      "address": "서울시 마포구 상암산로 34",
+      "phone": "02-7777-8888",
+      "email": "light@luminite.co.kr",
+      "note": "스마트홈 조명 솔루션 전문. Zigbee/Z-wave 연동 시공.",
+      "contacts": [
+        { "id": "c13", "vendor_id": "v9", "name": "오태현", "role": "기술팀장", "phone": "010-3344-5566", "email": "oh@luminite.co.kr" },
+        { "id": "c14", "vendor_id": "v9", "name": "문서연", "role": "영업", "phone": "010-4455-6677", "email": "moon@luminite.co.kr" }
+      ]
+    },
+    {
+      "id": "v10",
+      "company_name": "빛과공간",
+      "specialty": "Lighting",
+      "address": "서울시 서초구 강남대로 465",
+      "phone": "02-6666-7777",
+      "email": "info@lightspace.kr",
+      "note": "건축 조명 디자인 컨설팅 겸업. 프리미엄 브랜드 쇼룸 운영.",
+      "contacts": [
+        { "id": "c15", "vendor_id": "v10", "name": "배수영", "role": "디자이너", "phone": "010-5566-7788", "email": "bae@lightspace.kr" }
+      ]
+    }
+  ],
+  "material_vendor_links": [
+    { "material_id": "m1", "vendor_id": "v1" },
+    { "material_id": "m1", "vendor_id": "v2" },
+    { "material_id": "m2", "vendor_id": "v1" },
+    { "material_id": "m3", "vendor_id": "v3" },
+    { "material_id": "m3", "vendor_id": "v4" },
+    { "material_id": "m4", "vendor_id": "v3" },
+    { "material_id": "m5", "vendor_id": "v5" },
+    { "material_id": "m6", "vendor_id": "v5" },
+    { "material_id": "m6", "vendor_id": "v6" },
+    { "material_id": "m7", "vendor_id": "v2" },
+    { "material_id": "m7", "vendor_id": "v6" },
+    { "material_id": "m8", "vendor_id": "v7" },
+    { "material_id": "m9", "vendor_id": "v7" },
+    { "material_id": "m9", "vendor_id": "v8" },
+    { "material_id": "m10", "vendor_id": "v7" },
+    { "material_id": "m11", "vendor_id": "v9" },
+    { "material_id": "m12", "vendor_id": "v9" },
+    { "material_id": "m12", "vendor_id": "v10" },
+    { "material_id": "m13", "vendor_id": "v1" },
+    { "material_id": "m13", "vendor_id": "v2" },
+    { "material_id": "m14", "vendor_id": "v3" },
+    { "material_id": "m14", "vendor_id": "v4" }
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "project_name": "반포 자이 펜트하우스",
+      "client_name": "김**",
+      "status": "in_progress",
+      "address": "서울시 서초구 반포동 123",
+      "area_sqm": 280,
+      "start_date": "2026-03-01",
+      "end_date": "2026-07-31"
+    },
+    {
+      "id": "p2",
+      "project_name": "성수동 카페 리노베이션",
+      "client_name": "㈜스페이스랩",
+      "status": "completed",
+      "address": "서울시 성동구 성수이로 45",
+      "area_sqm": 85,
+      "start_date": "2025-11-01",
+      "end_date": "2026-01-31"
+    },
+    {
+      "id": "p3",
+      "project_name": "마포 아파트 풀패키지",
+      "client_name": "이**",
+      "status": "pending",
+      "address": "서울시 마포구 공덕동 77",
+      "area_sqm": 110,
+      "start_date": "2026-06-15",
+      "end_date": "2026-09-30"
+    }
+  ],
+  "project_specs": [
+    { "id": "ps1", "project_id": "p1", "material_id": "m2", "vendor_id": "v1", "memo": "거실/침실 천장 및 벽면 전체 적용" },
+    { "id": "ps2", "project_id": "p1", "material_id": "m4", "vendor_id": "v3", "memo": "욕실 바닥 및 벽 마감. 현장 실측 후 수량 확정" },
+    { "id": "ps3", "project_id": "p1", "material_id": "m5", "vendor_id": "v5", "memo": "전 공간 바닥 통일 적용" },
+    { "id": "ps4", "project_id": "p1", "material_id": "m11", "vendor_id": "v9", "memo": "스마트홈 연동. 침실 6개소, 거실 8개소" },
+    { "id": "ps5", "project_id": "p2", "material_id": "m1", "vendor_id": "v2", "memo": "인더스트리얼 컨셉 - 콘크리트 노출 후 코팅" },
+    { "id": "ps6", "project_id": "p2", "material_id": "m12", "vendor_id": "v10", "memo": "카운터 상부 펜던트 3개소" },
+    { "id": "ps7", "project_id": "p3", "material_id": "m6", "vendor_id": "v5", "memo": "전체 바닥재. 현관 제외" },
+    { "id": "ps8", "project_id": "p3", "material_id": "m7", "vendor_id": "v6", "memo": "침실 2개소 벽지" },
+    { "id": "ps9", "project_id": "p3", "material_id": "m8", "vendor_id": "v7", "memo": "욕실 양변기 1개소" }
+  ]
+}
