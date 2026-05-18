@@ -6,6 +6,7 @@ import { Search, Phone, Mail, Users, ExternalLink, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SortIcon } from "@/components/ui/sort-icon";
 import {
   Select,
   SelectContent,
@@ -15,6 +16,9 @@ import {
 } from "@/components/ui/select";
 import { deleteDistributor } from "@/lib/actions";
 import type { Distributor } from "@/types";
+
+type SortKey = "company_name" | "specialty" | "contacts";
+type SortDir = "asc" | "desc";
 
 interface Props {
   distributors: Distributor[];
@@ -27,6 +31,13 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
   const [specialty, setSpecialty] = useState("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [sortKey, setSortKey] = useState<SortKey>("company_name");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
+  }
 
   function handleDelete(id: string) {
     setDeletingId(id);
@@ -44,20 +55,32 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
         !q ||
         v.company_name.toLowerCase().includes(q) ||
         v.address.toLowerCase().includes(q) ||
-        v.contacts.some(
-          (c) =>
-            c.name.toLowerCase().includes(q) ||
-            c.role.toLowerCase().includes(q)
-        );
+        v.contacts.some((c) => c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q));
       const matchSpec = specialty === "all" || v.specialty === specialty;
       return matchSearch && matchSpec;
     });
   }, [distributors, search, specialty]);
 
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "company_name") cmp = a.company_name.localeCompare(b.company_name, "ko");
+      else if (sortKey === "specialty") cmp = (a.specialty ?? "").localeCompare(b.specialty ?? "", "ko");
+      else cmp = a.contacts.length - b.contacts.length;
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [filtered, sortKey, sortDir]);
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "company_name", label: "업체명" },
+    { key: "specialty", label: "전문분야" },
+    { key: "contacts", label: "담당자 수" },
+  ];
+
   return (
     <>
       {/* Toolbar */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -78,29 +101,43 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
             ))}
           </SelectContent>
         </Select>
+
+        {/* Sort buttons */}
+        <div className="flex items-center gap-1 border rounded-lg px-2 py-1">
+          <span className="text-xs text-muted-foreground mr-1">정렬</span>
+          {sortOptions.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => toggleSort(key)}
+              className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
+                sortKey === key
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {label}
+              <SortIcon active={sortKey === key} dir={sortDir} />
+            </button>
+          ))}
+        </div>
+
         <span className="text-sm text-muted-foreground ml-auto">
-          {filtered.length}개 업체
+          {sorted.length}개 업체
         </span>
       </div>
 
       {/* Grid */}
       <div className="grid grid-cols-2 gap-4">
-        {filtered.length === 0 ? (
+        {sorted.length === 0 ? (
           <div className="col-span-2 text-center py-16 text-muted-foreground">
             검색 결과가 없습니다.
           </div>
         ) : (
-          filtered.map((v) => (
-            <div
-              key={v.id}
-              className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow"
-            >
+          sorted.map((v) => (
+            <div key={v.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <Link
-                    href={`/distributors/${v.id}`}
-                    className="font-semibold hover:underline"
-                  >
+                  <Link href={`/distributors/${v.id}`} className="font-semibold hover:underline">
                     {v.company_name}
                   </Link>
                   <p className="text-xs text-muted-foreground mt-0.5">{v.address}</p>
@@ -120,18 +157,12 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
               </div>
 
               {v.note && (
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
-                  {v.note}
-                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">{v.note}</p>
               )}
 
               <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                <span className="flex items-center gap-1">
-                  <Phone className="h-3 w-3" />{v.phone}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Mail className="h-3 w-3" />{v.email}
-                </span>
+                <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{v.phone}</span>
+                <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{v.email}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -142,9 +173,7 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
                   {v.contacts.slice(0, 2).map((c) => (
                     <span key={c.id} className="text-foreground">{c.name}({c.role})</span>
                   ))}
-                  {v.contacts.length > 2 && (
-                    <span>외 {v.contacts.length - 2}명</span>
-                  )}
+                  {v.contacts.length > 2 && <span>외 {v.contacts.length - 2}명</span>}
                 </div>
                 <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" asChild>
                   <Link href={`/distributors/${v.id}`}>

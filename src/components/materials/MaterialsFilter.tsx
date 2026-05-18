@@ -4,6 +4,7 @@ import { useState, useMemo, useTransition } from "react";
 import { Search, ImageIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SortIcon } from "@/components/ui/sort-icon";
 import {
   Select,
   SelectContent,
@@ -20,6 +21,9 @@ import {
 import { deleteMaterial } from "@/lib/actions";
 import type { Material, MaterialCategory } from "@/types";
 
+type SortKey = "category" | "material_item" | "material_finish" | "material_size";
+type SortDir = "asc" | "desc";
+
 interface Props {
   materials: Material[];
   categories: MaterialCategory[];
@@ -32,11 +36,18 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
   const [selected, setSelected] = useState<Material | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [sortKey, setSortKey] = useState<SortKey>("material_item");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   const categoryMap = useMemo(
     () => Object.fromEntries(categories.map((c) => [c.id, c])),
     [categories]
   );
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
+  }
 
   const filtered = useMemo(() => {
     return materials.filter((m) => {
@@ -53,6 +64,24 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
     });
   }, [materials, search, selectedCat, categoryMap]);
 
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      let av = "", bv = "";
+      if (sortKey === "category") {
+        av = categoryMap[a.category_id]?.category_eng ?? "";
+        bv = categoryMap[b.category_id]?.category_eng ?? "";
+      } else if (sortKey === "material_item") {
+        av = a.material_item; bv = b.material_item;
+      } else if (sortKey === "material_finish") {
+        av = a.material_finish ?? ""; bv = b.material_finish ?? "";
+      } else {
+        av = a.material_size ?? ""; bv = b.material_size ?? "";
+      }
+      const cmp = av.localeCompare(bv, "ko");
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [filtered, sortKey, sortDir, categoryMap]);
+
   const selectedCat2 = selected ? categoryMap[selected.category_id] : null;
 
   function handleDelete(id: string) {
@@ -63,6 +92,8 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
       setDeletingId(null);
     });
   }
+
+  const thClass = "flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
 
   return (
     <>
@@ -91,7 +122,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
           </SelectContent>
         </Select>
         <span className="text-sm text-muted-foreground ml-auto">
-          {filtered.length}개 결과
+          {sorted.length}개 결과
         </span>
       </div>
 
@@ -100,29 +131,42 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="text-left font-medium text-muted-foreground px-4 py-3 w-36">카테고리</th>
-              <th className="text-left font-medium text-muted-foreground px-4 py-3">자재명</th>
-              <th className="text-left font-medium text-muted-foreground px-4 py-3 w-32">FINISH</th>
-              <th className="text-left font-medium text-muted-foreground px-4 py-3 w-36">SIZE</th>
-              <th className="px-4 py-3 w-20 text-center font-medium text-muted-foreground">상세보기</th>
+              <th className="px-4 py-3 w-36">
+                <button onClick={() => toggleSort("category")} className={thClass}>
+                  카테고리 <SortIcon active={sortKey === "category"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("material_item")} className={thClass}>
+                  자재명 <SortIcon active={sortKey === "material_item"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3 w-32">
+                <button onClick={() => toggleSort("material_finish")} className={thClass}>
+                  FINISH <SortIcon active={sortKey === "material_finish"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3 w-36">
+                <button onClick={() => toggleSort("material_size")} className={thClass}>
+                  SIZE <SortIcon active={sortKey === "material_size"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3 w-20 text-center text-xs font-medium text-muted-foreground">상세보기</th>
               <th className="px-4 py-3 w-12" />
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {sorted.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-16 text-muted-foreground">
                   검색 결과가 없습니다.
                 </td>
               </tr>
             ) : (
-              filtered.map((m) => {
+              sorted.map((m) => {
                 const cat = categoryMap[m.category_id];
                 return (
-                  <tr
-                    key={m.id}
-                    className="border-b last:border-0 hover:bg-muted/30 transition-colors"
-                  >
+                  <tr key={m.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
                       {cat ? (
                         <div>
@@ -137,12 +181,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                     <td className="px-4 py-3 text-sm text-muted-foreground">{m.material_finish || "-"}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{m.material_size || "-"}</td>
                     <td className="px-4 py-3 text-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-7 px-2"
-                        onClick={() => setSelected(m)}
-                      >
+                      <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => setSelected(m)}>
                         상세
                       </Button>
                     </td>
@@ -171,16 +210,10 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
           <DialogHeader>
             <DialogTitle>{selected?.material_item}</DialogTitle>
           </DialogHeader>
-
           <div className="px-6 pb-6 space-y-5">
-            {/* Image */}
             <div className="w-full aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center border">
               {selected?.material_image ? (
-                <img
-                  src={selected.material_image}
-                  alt={selected.material_item}
-                  className="w-full h-full object-cover"
-                />
+                <img src={selected.material_image} alt={selected.material_item} className="w-full h-full object-cover" />
               ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <ImageIcon className="h-10 w-10 opacity-30" />
@@ -188,15 +221,11 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                 </div>
               )}
             </div>
-
-            {/* Details */}
             <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
                 <dt className="text-xs text-muted-foreground mb-0.5">카테고리</dt>
                 <dd className="font-medium">
-                  {selectedCat2
-                    ? `${selectedCat2.category_kor} (${selectedCat2.category_eng})`
-                    : "-"}
+                  {selectedCat2 ? `${selectedCat2.category_kor} (${selectedCat2.category_eng})` : "-"}
                 </dd>
               </div>
               <div>

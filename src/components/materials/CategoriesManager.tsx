@@ -1,12 +1,16 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useMemo } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SortIcon } from "@/components/ui/sort-icon";
 import { createMaterialCategory, deleteMaterialCategory } from "@/lib/actions";
 import type { MaterialCategory } from "@/types";
+
+type SortKey = "code_prefix" | "category_eng" | "category_kor";
+type SortDir = "asc" | "desc";
 
 interface Props {
   initialCategories: MaterialCategory[];
@@ -19,6 +23,20 @@ export function CategoriesManager({ initialCategories }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [addPending, startAdd] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("code_prefix");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
+  }
+
+  const sorted = useMemo(() => {
+    return [...categories].sort((a, b) => {
+      const cmp = a[sortKey].localeCompare(b[sortKey], "ko");
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [categories, sortKey, sortDir]);
 
   function validate() {
     const e: Record<string, string> = {};
@@ -71,6 +89,8 @@ export function CategoriesManager({ initialCategories }: Props) {
     });
   }
 
+  const thClass = "flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
+
   return (
     <div className="p-8 max-w-3xl">
       <div className="flex items-center justify-between mb-8">
@@ -101,9 +121,7 @@ export function CategoriesManager({ initialCategories }: Props) {
                   onChange={(e) => setForm((f) => ({ ...f, code_prefix: e.target.value }))}
                   className={errors.code_prefix ? "border-destructive" : ""}
                 />
-                {errors.code_prefix && (
-                  <p className="text-xs text-destructive mt-1">{errors.code_prefix}</p>
-                )}
+                {errors.code_prefix && <p className="text-xs text-destructive mt-1">{errors.code_prefix}</p>}
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">
@@ -115,9 +133,7 @@ export function CategoriesManager({ initialCategories }: Props) {
                   onChange={(e) => setForm((f) => ({ ...f, category_eng: e.target.value }))}
                   className={errors.category_eng ? "border-destructive" : ""}
                 />
-                {errors.category_eng && (
-                  <p className="text-xs text-destructive mt-1">{errors.category_eng}</p>
-                )}
+                {errors.category_eng && <p className="text-xs text-destructive mt-1">{errors.category_eng}</p>}
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">
@@ -129,14 +145,10 @@ export function CategoriesManager({ initialCategories }: Props) {
                   onChange={(e) => setForm((f) => ({ ...f, category_kor: e.target.value }))}
                   className={errors.category_kor ? "border-destructive" : ""}
                 />
-                {errors.category_kor && (
-                  <p className="text-xs text-destructive mt-1">{errors.category_kor}</p>
-                )}
+                {errors.category_kor && <p className="text-xs text-destructive mt-1">{errors.category_kor}</p>}
               </div>
             </div>
-            {errors._server && (
-              <p className="text-xs text-destructive mb-3">{errors._server}</p>
-            )}
+            {errors._server && <p className="text-xs text-destructive mb-3">{errors._server}</p>}
             <div className="flex gap-2">
               <Button size="sm" onClick={handleAdd} disabled={addPending}>
                 {addPending ? "저장 중..." : "추가"}
@@ -153,21 +165,33 @@ export function CategoriesManager({ initialCategories }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="text-left font-medium text-muted-foreground px-4 py-3 w-28">코드 접두사</th>
-              <th className="text-left font-medium text-muted-foreground px-4 py-3">영문명</th>
-              <th className="text-left font-medium text-muted-foreground px-4 py-3">한글명</th>
+              <th className="px-4 py-3 w-28">
+                <button onClick={() => toggleSort("code_prefix")} className={thClass}>
+                  코드 접두사 <SortIcon active={sortKey === "code_prefix"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("category_eng")} className={thClass}>
+                  영문명 <SortIcon active={sortKey === "category_eng"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("category_kor")} className={thClass}>
+                  한글명 <SortIcon active={sortKey === "category_kor"} dir={sortDir} />
+                </button>
+              </th>
               <th className="px-4 py-3 w-12" />
             </tr>
           </thead>
           <tbody>
-            {categories.length === 0 ? (
+            {sorted.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-12 text-muted-foreground">
                   등록된 카테고리가 없습니다.
                 </td>
               </tr>
             ) : (
-              categories.map((c) => (
+              sorted.map((c) => (
                 <tr key={c.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-mono font-medium">{c.code_prefix}</td>
                   <td className="px-4 py-3 font-medium">{c.category_eng}</td>
