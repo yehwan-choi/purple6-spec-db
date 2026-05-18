@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useTransition, useState } from "react";
 import { createProject } from "@/lib/actions";
 import {
   Dialog,
@@ -15,11 +15,20 @@ import { Plus } from "lucide-react";
 
 export function AddProjectModal() {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(createProject, null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state?.success) setOpen(false);
-  }, [state]);
+  function handleSubmit(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      const result = await createProject(null, formData);
+      if (result?.success) {
+        setOpen(false);
+      } else {
+        setError(result?.error ?? "오류가 발생했습니다.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -33,7 +42,7 @@ export function AddProjectModal() {
         <DialogHeader>
           <DialogTitle>프로젝트 생성</DialogTitle>
         </DialogHeader>
-        <form action={formAction} className="space-y-4 px-6 pb-6">
+        <form action={handleSubmit} className="space-y-4 px-6 pb-6">
           <div className="space-y-1.5">
             <label className="text-sm font-medium">프로젝트명 *</label>
             <Input name="project_name" placeholder="프로젝트명 입력" required />
@@ -56,8 +65,8 @@ export function AddProjectModal() {
             </div>
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           <div className="flex justify-end gap-2 pt-2">

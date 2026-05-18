@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useTransition, useState } from "react";
 import { createDistributor } from "@/lib/actions";
 import {
   Dialog,
@@ -23,14 +23,21 @@ import { Plus } from "lucide-react";
 export function AddDistributorModal() {
   const [open, setOpen] = useState(false);
   const [distributorType, setDistributorType] = useState<string>("");
-  const [state, formAction, pending] = useActionState(createDistributor, null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state?.success) {
-      setOpen(false);
-      setDistributorType("");
-    }
-  }, [state]);
+  function handleSubmit(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      const result = await createDistributor(null, formData);
+      if (result?.success) {
+        setOpen(false);
+        setDistributorType("");
+      } else {
+        setError(result?.error ?? "오류가 발생했습니다.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -44,7 +51,7 @@ export function AddDistributorModal() {
         <DialogHeader>
           <DialogTitle>업체 등록</DialogTitle>
         </DialogHeader>
-        <form action={formAction} className="space-y-4 px-6 pb-6">
+        <form action={handleSubmit} className="space-y-4 px-6 pb-6">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">업체 구분 *</label>
@@ -99,8 +106,8 @@ export function AddDistributorModal() {
             />
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           <div className="flex justify-end gap-2 pt-2">

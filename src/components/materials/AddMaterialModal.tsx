@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useTransition, useState } from "react";
 import { createMaterial } from "@/lib/actions";
 import {
   Dialog,
@@ -24,14 +24,21 @@ import type { MaterialCategory } from "@/types";
 export function AddMaterialModal({ categories }: { categories: MaterialCategory[] }) {
   const [open, setOpen] = useState(false);
   const [categoryId, setCategoryId] = useState("");
-  const [state, formAction, pending] = useActionState(createMaterial, null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state?.success) {
-      setOpen(false);
-      setCategoryId("");
-    }
-  }, [state]);
+  function handleSubmit(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      const result = await createMaterial(null, formData);
+      if (result?.success) {
+        setOpen(false);
+        setCategoryId("");
+      } else {
+        setError(result?.error ?? "오류가 발생했습니다.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,7 +52,7 @@ export function AddMaterialModal({ categories }: { categories: MaterialCategory[
         <DialogHeader>
           <DialogTitle>마감재 등록</DialogTitle>
         </DialogHeader>
-        <form action={formAction} className="space-y-4 px-6 pb-6">
+        <form action={handleSubmit} className="space-y-4 px-6 pb-6">
           <div className="space-y-1.5">
             <label className="text-sm font-medium">카테고리 *</label>
             <Select value={categoryId} onValueChange={setCategoryId} required>
@@ -84,8 +91,8 @@ export function AddMaterialModal({ categories }: { categories: MaterialCategory[
             <Input name="material_size" placeholder="예: 600x600mm" />
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           <div className="flex justify-end gap-2 pt-2">
