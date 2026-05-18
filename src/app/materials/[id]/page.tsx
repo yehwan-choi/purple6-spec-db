@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   getMaterialById,
   getMaterialCategoryById,
+  getDistributorTypes,
   getDistributorsForMaterial,
   getProjectSpecsWithProjectForMaterial,
 } from "@/lib/data";
@@ -16,10 +17,11 @@ interface Props {
 
 export default async function MaterialDetailPage({ params }: Props) {
   const { id } = await params;
-  const [material, distributors, specRows] = await Promise.all([
+  const [material, distributors, specRows, distributorTypes] = await Promise.all([
     getMaterialById(id),
     getDistributorsForMaterial(id),
     getProjectSpecsWithProjectForMaterial(id),
+    getDistributorTypes(),
   ]);
   if (!material) notFound();
 
@@ -62,6 +64,7 @@ export default async function MaterialDetailPage({ params }: Props) {
         category={category}
         distributors={distributors}
         relatedProjects={relatedProjects}
+        distributorTypes={distributorTypes}
       />
     </div>
   );

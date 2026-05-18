@@ -9,20 +9,26 @@ import { SortIcon } from "@/components/ui/sort-icon";
 import { cn } from "@/lib/utils";
 import { deleteDistributor } from "@/lib/actions";
 import { AddDistributorModal } from "@/components/distributors/AddDistributorModal";
-import type { Distributor, DistributorType } from "@/types";
+import type { Distributor, DistributorTypeRecord } from "@/types";
 
 type SortKey = "company_name" | "contacts";
 type SortDir = "asc" | "desc";
 
 interface Props {
   distributors: Distributor[];
-  specialties: string[];
-  defaultType?: DistributorType;
+  distributorTypes: DistributorTypeRecord[];
+  defaultType?: string;
+  lockModal?: boolean;
 }
 
-export function DistributorsFilter({ distributors: initialDistributors, defaultType }: Props) {
+export function DistributorsFilter({
+  distributors: initialDistributors,
+  distributorTypes,
+  defaultType,
+  lockModal = false,
+}: Props) {
   const [distributors, setDistributors] = useState<Distributor[]>(initialDistributors);
-  const [activeTab, setActiveTab] = useState<DistributorType>(defaultType ?? "material");
+  const [activeTab, setActiveTab] = useState<string>(defaultType ?? distributorTypes[0]?.id ?? "");
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -75,21 +81,6 @@ export function DistributorsFilter({ distributors: initialDistributors, defaultT
 
   const thClass = "flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
 
-  const allTabs: { type: DistributorType; label: string }[] = [
-    { type: "material", label: "마감재 업체" },
-    { type: "other", label: "기타 업체" },
-  ];
-
-  // 마감재 업체 페이지: 마감재 탭만 / 기타 업체 페이지: 마감재 제외 / 전체: 모두 표시
-  const tabs = defaultType === "material"
-    ? allTabs.filter((t) => t.type === "material")
-    : defaultType === "other"
-    ? allTabs.filter((t) => t.type !== "material")
-    : allTabs;
-
-  // 마감재 업체 페이지에서만 모달 타입 잠금
-  const lockModalType = defaultType === "material";
-
   return (
     <>
       {/* Header */}
@@ -102,33 +93,36 @@ export function DistributorsFilter({ distributors: initialDistributors, defaultT
           key={activeTab}
           onSuccess={handleAddSuccess}
           defaultType={activeTab}
-          lockType={lockModalType}
+          lockType={lockModal}
+          distributorTypes={distributorTypes}
         />
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b mb-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab.type}
-            onClick={() => { setActiveTab(tab.type); setSearch(""); }}
-            className={cn(
-              "px-5 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
-              activeTab === tab.type
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {tab.label}
-            <span className={cn(
-              "ml-1.5 text-xs rounded-full px-1.5 py-0.5",
-              activeTab === tab.type ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-            )}>
-              {distributors.filter((v) => v.distributor_type === tab.type).length}
-            </span>
-          </button>
-        ))}
-      </div>
+      {distributorTypes.length > 1 && (
+        <div className="flex border-b mb-4">
+          {distributorTypes.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => { setActiveTab(t.id); setSearch(""); }}
+              className={cn(
+                "px-5 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
+                activeTab === t.id
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t.label_kor}
+              <span className={cn(
+                "ml-1.5 text-xs rounded-full px-1.5 py-0.5",
+                activeTab === t.id ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+              )}>
+                {distributors.filter((v) => v.distributor_type === t.id).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">

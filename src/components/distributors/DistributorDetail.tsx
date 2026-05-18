@@ -24,7 +24,7 @@ import {
   addProjectToDistributor,
   removeProjectFromDistributor,
 } from "@/lib/actions";
-import type { Distributor, DistributorContact, Material, MaterialCategory, Project } from "@/types";
+import type { Distributor, DistributorContact, DistributorTypeRecord, Material, MaterialCategory, Project } from "@/types";
 
 const PAGE_SIZE = 5;
 
@@ -35,6 +35,7 @@ interface Props {
   allMaterials: Material[];
   allProjects: Project[];
   categoryMap: Map<string, MaterialCategory>;
+  distributorTypes: DistributorTypeRecord[];
 }
 
 export function DistributorDetail({
@@ -44,6 +45,7 @@ export function DistributorDetail({
   allMaterials,
   allProjects,
   categoryMap,
+  distributorTypes,
 }: Props) {
   const [, startTransition] = useTransition();
 
@@ -199,7 +201,7 @@ export function DistributorDetail({
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Badge variant="outline">
-            {distributor.distributor_type === "material" ? "마감재 업체" : "기타 업체"}
+            {distributorTypes.find((t) => t.id === distributor.distributor_type)?.label_kor ?? distributor.distributor_type}
           </Badge>
         </div>
         <h1 className="text-3xl font-bold tracking-tight">{distributor.company_name}</h1>

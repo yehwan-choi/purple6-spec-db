@@ -101,6 +101,7 @@ export function Sidebar() {
   const distributorSubItems = [
     { label: "마감재 업체", href: "/distributors/material", icon: Truck },
     { label: "기타 업체", href: "/distributors/other", icon: Wrench },
+    { label: "업체 구분 관리", href: "/distributors/types", icon: Tag },
   ];
 
   const bottomNavItems = [

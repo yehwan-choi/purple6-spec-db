@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Building2, Phone, Mail, FolderOpen, Tag } from "lucide-react";
-import type { Material, MaterialCategory, Distributor, ProjectSpec, Project } from "@/types";
+import type { Material, MaterialCategory, Distributor, DistributorTypeRecord, ProjectSpec, Project } from "@/types";
 
 interface RelatedProject {
   spec: ProjectSpec;
@@ -18,9 +18,10 @@ interface Props {
   category: MaterialCategory | undefined;
   distributors: Distributor[];
   relatedProjects: RelatedProject[];
+  distributorTypes: DistributorTypeRecord[];
 }
 
-export function MaterialDetailTabs({ material, category, distributors, relatedProjects }: Props) {
+export function MaterialDetailTabs({ material, category, distributors, relatedProjects, distributorTypes }: Props) {
   return (
     <Tabs defaultValue="spec">
       <TabsList variant="line">
@@ -80,7 +81,7 @@ export function MaterialDetailTabs({ material, category, distributors, relatedPr
                       </Link>
                       <p className="text-xs text-muted-foreground mt-0.5">{v.address}</p>
                     </div>
-                    <Badge variant="outline">{v.distributor_type === "material" ? "마감재 업체" : "기타 업체"}</Badge>
+                    <Badge variant="outline">{distributorTypes.find((t) => t.id === v.distributor_type)?.label_kor ?? v.distributor_type}</Badge>
                   </div>
                   <Separator className="mb-3" />
                   <div className="space-y-1.5">

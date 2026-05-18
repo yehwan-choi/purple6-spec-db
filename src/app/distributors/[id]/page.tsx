@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import {
   getDistributorById,
+  getDistributorTypes,
   getMaterialsForDistributor,
   getMaterialCategories,
   getRelatedProjectsForDistributor,
@@ -15,7 +16,7 @@ interface Props {
 
 export default async function DistributorDetailPage({ params }: Props) {
   const { id } = await params;
-  const [distributor, materials, relatedProjects, categories, allMaterials, allProjects] =
+  const [distributor, materials, relatedProjects, categories, allMaterials, allProjects, distributorTypes] =
     await Promise.all([
       getDistributorById(id),
       getMaterialsForDistributor(id),
@@ -23,6 +24,7 @@ export default async function DistributorDetailPage({ params }: Props) {
       getMaterialCategories(),
       getMaterials(),
       getProjects(),
+      getDistributorTypes(),
     ]);
   if (!distributor) notFound();
 
@@ -36,6 +38,7 @@ export default async function DistributorDetailPage({ params }: Props) {
       allMaterials={allMaterials}
       allProjects={allProjects}
       categoryMap={categoryMap}
+      distributorTypes={distributorTypes}
     />
   );
 }

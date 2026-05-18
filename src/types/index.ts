@@ -23,11 +23,18 @@ export interface DistributorContact {
   email: string;
 }
 
-export type DistributorType = "material" | "other";
+export type DistributorType = string;
+
+export interface DistributorTypeRecord {
+  id: string;
+  label_kor: string;
+  sort_order: number;
+  is_material: boolean;
+}
 
 export interface Distributor {
   id: string;
-  distributor_type: DistributorType;
+  distributor_type: string;
   company_name: string;
   address: string;
   note: string;

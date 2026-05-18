@@ -70,8 +70,6 @@ export async function createDistributor(
   }
 
   revalidatePath("/distributors");
-  revalidatePath("/distributors/material");
-  revalidatePath("/distributors/other");
   return { success: true };
 }
 
@@ -113,8 +111,6 @@ export async function deleteDistributor(id: string): Promise<ActionState> {
   const { error } = await supabase.from("distributors").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
   revalidatePath("/distributors");
-  revalidatePath("/distributors/material");
-  revalidatePath("/distributors/other");
   return { success: true };
 }
 
@@ -254,5 +250,39 @@ export async function createProject(
   });
   if (error) return { success: false, error: error.message };
   revalidatePath("/projects");
+  return { success: true };
+}
+
+// ── 업체 구분(distributor_types) CRUD ────────────────────────────────────────
+
+export async function createDistributorType(data: {
+  id: string;
+  label_kor: string;
+  sort_order: number;
+  is_material: boolean;
+}): Promise<ActionState> {
+  const { error } = await supabase.from("distributor_types").insert(data);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/distributors/types");
+  revalidatePath("/distributors");
+  return { success: true };
+}
+
+export async function updateDistributorType(
+  id: string,
+  data: { label_kor: string; sort_order: number; is_material: boolean }
+): Promise<ActionState> {
+  const { error } = await supabase.from("distributor_types").update(data).eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/distributors/types");
+  revalidatePath("/distributors");
+  return { success: true };
+}
+
+export async function deleteDistributorType(id: string): Promise<ActionState> {
+  const { error } = await supabase.from("distributor_types").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/distributors/types");
+  revalidatePath("/distributors");
   return { success: true };
 }

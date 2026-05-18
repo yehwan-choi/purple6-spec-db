@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
-import type { Distributor, DistributorContact, DistributorType } from "@/types";
+import type { Distributor, DistributorContact, DistributorTypeRecord } from "@/types";
 
 interface ContactRow {
   name: string;
@@ -30,11 +30,12 @@ interface ContactRow {
 
 interface Props {
   onSuccess?: (distributor: Distributor) => void;
-  defaultType?: DistributorType;
+  defaultType?: string;
   lockType?: boolean;
+  distributorTypes: DistributorTypeRecord[];
 }
 
-export function AddDistributorModal({ onSuccess, defaultType, lockType }: Props) {
+export function AddDistributorModal({ onSuccess, defaultType, lockType, distributorTypes }: Props) {
   const [open, setOpen] = useState(false);
   const [distributorType, setDistributorType] = useState<string>(defaultType ?? "");
   const [contacts, setContacts] = useState<ContactRow[]>([]);
@@ -79,7 +80,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType }: Props)
           }));
         onSuccess?.({
           id,
-          distributor_type: (formData.get("distributor_type") as DistributorType) || "material",
+          distributor_type: distributorType,
           company_name: (formData.get("company_name") as string) || "",
           address: (formData.get("address") as string) || "",
           note: (formData.get("note") as string) || "",
@@ -117,8 +118,11 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType }: Props)
                 <SelectValue placeholder="구분 선택" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="material">마감재 업체</SelectItem>
-                <SelectItem value="other">기타 업체</SelectItem>
+                {distributorTypes.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.label_kor}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <input type="hidden" name="distributor_type" value={distributorType} />

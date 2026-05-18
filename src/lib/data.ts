@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Material, MaterialCategory, Distributor, Project, ProjectSpec } from "@/types";
+import type { Material, MaterialCategory, Distributor, DistributorTypeRecord, Project, ProjectSpec } from "@/types";
 
 export async function getMaterials(): Promise<Material[]> {
   const { data, error } = await supabase.from("materials").select("*").order("material_item");
@@ -23,6 +23,12 @@ export async function getMaterialCategoryById(id: string): Promise<MaterialCateg
   const { data, error } = await supabase.from("material_categories").select("*").eq("id", id).single();
   if (error) return null;
   return data;
+}
+
+export async function getDistributorTypes(): Promise<DistributorTypeRecord[]> {
+  const { data, error } = await supabase.from("distributor_types").select("*").order("sort_order");
+  if (error) throw error;
+  return data as DistributorTypeRecord[];
 }
 
 export async function getDistributors(): Promise<Distributor[]> {
