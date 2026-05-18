@@ -130,6 +130,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
+              <th className="px-4 py-3 w-16 text-xs font-medium text-muted-foreground text-center">이미지</th>
               <th className="px-4 py-3 w-36">
                 <button onClick={() => toggleSort("category")} className={thClass}>
                   카테고리 <SortIcon active={sortKey === "category"} dir={sortDir} />
@@ -157,7 +158,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-16 text-muted-foreground">
+                <td colSpan={7} className="text-center py-16 text-muted-foreground">
                   검색 결과가 없습니다.
                 </td>
               </tr>
@@ -166,7 +167,16 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                 const cat = categoryMap[m.category_id];
                 return (
                   <tr key={m.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-3 py-2 text-center">
+                      <div className="w-14 h-14 mx-auto rounded-md overflow-hidden bg-muted border flex items-center justify-center shrink-0">
+                        {m.material_image ? (
+                          <img src={m.material_image} alt={m.material_item} className="w-full h-full object-cover" />
+                        ) : (
+                          <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 text-center">
                       {cat ? (
                         <div>
                           <div className="text-xs font-medium">{cat.category_kor}</div>
@@ -176,15 +186,15 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                         <span className="text-muted-foreground">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-medium text-center">{m.material_item}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground text-center">{m.material_finish || "-"}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground font-mono text-center">{m.material_size || "-"}</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-2 font-medium text-center">{m.material_item}</td>
+                    <td className="px-4 py-2 text-sm text-muted-foreground text-center">{m.material_finish || "-"}</td>
+                    <td className="px-4 py-2 text-xs text-muted-foreground font-mono text-center">{m.material_size || "-"}</td>
+                    <td className="px-4 py-2 text-center">
                       <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => setSelected(m)}>
                         상세
                       </Button>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-2">
                       <Button
                         variant="ghost"
                         size="icon"

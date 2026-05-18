@@ -38,7 +38,7 @@ interface Props {
 export function AddDistributorModal({ onSuccess, defaultType, lockType, distributorTypes }: Props) {
   const [open, setOpen] = useState(false);
   const [distributorType, setDistributorType] = useState<string>(defaultType ?? "");
-  const [contacts, setContacts] = useState<ContactRow[]>([]);
+  const [contacts, setContacts] = useState<ContactRow[]>([{ name: "", role: "", phone: "", email: "" }]);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -56,7 +56,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
 
   function resetForm() {
     setDistributorType(defaultType ?? "");
-    setContacts([]);
+    setContacts([{ name: "", role: "", phone: "", email: "" }]);
     setError(null);
   }
 
@@ -157,8 +157,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
               </Button>
             </div>
 
-            {contacts.length > 0 && (
-              <div className="space-y-3 rounded-lg border p-3">
+            <div className="space-y-3 rounded-lg border p-3">
                 {contacts.map((c, idx) => (
                   <div key={idx} className="space-y-2">
                     {idx > 0 && <div className="border-t pt-3" />}
@@ -174,7 +173,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       <Input
                         placeholder="이름 *"
                         value={c.name}
@@ -202,8 +201,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
+            </div>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
