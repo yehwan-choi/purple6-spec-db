@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { deleteDistributor } from "@/lib/actions";
+import { AddDistributorModal } from "@/components/distributors/AddDistributorModal";
 import type { Distributor } from "@/types";
 
 type SortKey = "company_name" | "specialty" | "contacts";
@@ -77,8 +78,21 @@ export function DistributorsFilter({ distributors: initialDistributors, specialt
     { key: "contacts", label: "담당자 수" },
   ];
 
+  function handleAddSuccess(d: Distributor) {
+    setDistributors((prev) => [...prev, d]);
+  }
+
   return (
     <>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">업체</h1>
+          <p className="text-muted-foreground mt-1">자재 공급 및 시공 협력 업체 관리</p>
+        </div>
+        <AddDistributorModal onSuccess={handleAddSuccess} />
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="relative flex-1 max-w-sm">

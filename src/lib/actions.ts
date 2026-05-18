@@ -43,7 +43,7 @@ export async function createDistributor(
   formData: FormData
 ): Promise<ActionState> {
   const { error } = await supabase.from("distributors").insert({
-    id: crypto.randomUUID(),
+    id: (formData.get("id") as string) || crypto.randomUUID(),
     distributor_type: formData.get("distributor_type") as string,
     company_name: formData.get("company_name") as string,
     specialty: (formData.get("specialty") as string) || null,

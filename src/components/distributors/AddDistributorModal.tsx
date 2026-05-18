@@ -19,8 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import type { Distributor, DistributorType } from "@/types";
 
-export function AddDistributorModal() {
+interface Props {
+  onSuccess?: (distributor: Distributor) => void;
+}
+
+export function AddDistributorModal({ onSuccess }: Props) {
   const [open, setOpen] = useState(false);
   const [distributorType, setDistributorType] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +33,22 @@ export function AddDistributorModal() {
 
   function handleSubmit(formData: FormData) {
     setError(null);
+    const id = crypto.randomUUID();
+    formData.set("id", id);
     startTransition(async () => {
       const result = await createDistributor(null, formData);
       if (result?.success) {
+        onSuccess?.({
+          id,
+          distributor_type: (formData.get("distributor_type") as DistributorType) || "material",
+          company_name: (formData.get("company_name") as string) || "",
+          specialty: (formData.get("specialty") as string) || "",
+          address: (formData.get("address") as string) || "",
+          phone: (formData.get("phone") as string) || "",
+          email: (formData.get("email") as string) || "",
+          note: (formData.get("note") as string) || "",
+          contacts: [],
+        });
         setOpen(false);
         setDistributorType("");
       } else {
