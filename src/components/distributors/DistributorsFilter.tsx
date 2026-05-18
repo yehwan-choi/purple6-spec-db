@@ -2,8 +2,9 @@
 
 import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
-import { Search, Users, ExternalLink, Trash2 } from "lucide-react";
+import { Search, Users, ChevronRight, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SortIcon } from "@/components/ui/sort-icon";
 import { deleteDistributor } from "@/lib/actions";
@@ -67,10 +68,7 @@ export function DistributorsFilter({ distributors: initialDistributors, defaultT
     });
   }, [filtered, sortKey, sortDir]);
 
-  const sortOptions: { key: SortKey; label: string }[] = [
-    { key: "company_name", label: "업체명" },
-    { key: "contacts", label: "담당자 수" },
-  ];
+  const thClass = "flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
 
   return (
     <>
@@ -84,7 +82,7 @@ export function DistributorsFilter({ distributors: initialDistributors, defaultT
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 mb-6 flex-wrap">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -94,81 +92,94 @@ export function DistributorsFilter({ distributors: initialDistributors, defaultT
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-
-        {/* Sort buttons */}
-        <div className="flex items-center gap-1 border rounded-lg px-2 py-1">
-          <span className="text-xs text-muted-foreground mr-1">정렬</span>
-          {sortOptions.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => toggleSort(key)}
-              className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
-                sortKey === key
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-              <SortIcon active={sortKey === key} dir={sortDir} />
-            </button>
-          ))}
-        </div>
-
-        <span className="text-sm text-muted-foreground ml-auto">
-          {sorted.length}개 업체
-        </span>
+        <span className="text-sm text-muted-foreground ml-auto">{sorted.length}개 업체</span>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        {sorted.length === 0 ? (
-          <div className="col-span-2 text-center py-16 text-muted-foreground">
-            검색 결과가 없습니다.
-          </div>
-        ) : (
-          sorted.map((v) => (
-            <div key={v.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <Link href={`/distributors/${v.id}`} className="font-semibold hover:underline">
-                    {v.company_name}
-                  </Link>
-                  <p className="text-xs text-muted-foreground mt-0.5">{v.address}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                  onClick={() => handleDelete(v.id)}
-                  disabled={deletingId === v.id}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-
-              {v.note && (
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">{v.note}</p>
-              )}
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Users className="h-3.5 w-3.5" />
-                  <span>담당자 {v.contacts.length}명</span>
-                  <span className="text-muted-foreground/50">·</span>
-                  {v.contacts.slice(0, 2).map((c) => (
-                    <span key={c.id} className="text-foreground">{c.name}({c.role})</span>
-                  ))}
-                  {v.contacts.length > 2 && <span>외 {v.contacts.length - 2}명</span>}
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" asChild>
-                  <Link href={`/distributors/${v.id}`}>
-                    상세보기 <ExternalLink className="h-3 w-3" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          ))
-        )}
+      {/* Table */}
+      <div className="rounded-xl border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/40">
+              <th className="px-4 py-3 text-left">
+                <button onClick={() => toggleSort("company_name")} className={thClass}>
+                  업체명 <SortIcon active={sortKey === "company_name"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left w-24">
+                <span className="text-xs font-medium text-muted-foreground">구분</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-medium text-muted-foreground">주소</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <button onClick={() => toggleSort("contacts")} className={thClass}>
+                  담당자 <SortIcon active={sortKey === "contacts"} dir={sortDir} />
+                </button>
+              </th>
+              <th className="px-4 py-3 w-16" />
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-16 text-muted-foreground">
+                  검색 결과가 없습니다.
+                </td>
+              </tr>
+            ) : (
+              sorted.map((v) => (
+                <tr key={v.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3">
+                    <Link href={`/distributors/${v.id}`} className="font-medium hover:underline">
+                      {v.company_name}
+                    </Link>
+                    {v.note && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{v.note}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant="outline" className="text-xs whitespace-nowrap">
+                      {v.distributor_type === "material" ? "마감재" : "기타"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">
+                    {v.address || "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Users className="h-3.5 w-3.5 shrink-0" />
+                      <span>{v.contacts.length}명</span>
+                      {v.contacts.length > 0 && (
+                        <span className="text-foreground">
+                          {v.contacts.slice(0, 2).map((c) => c.name).join(", ")}
+                          {v.contacts.length > 2 && ` 외 ${v.contacts.length - 2}명`}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" asChild>
+                        <Link href={`/distributors/${v.id}`}>
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDelete(v.id)}
+                        disabled={deletingId === v.id}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </>
   );
