@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Search, ImageIcon } from "lucide-react";
+import { useState, useMemo, useTransition } from "react";
+import { Search, ImageIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { deleteMaterial } from "@/lib/actions";
 import type { Material, MaterialCategory } from "@/types";
 
 interface Props {
@@ -24,10 +25,13 @@ interface Props {
   categories: MaterialCategory[];
 }
 
-export function MaterialsFilter({ materials, categories }: Props) {
+export function MaterialsFilter({ materials: initialMaterials, categories }: Props) {
+  const [materials, setMaterials] = useState<Material[]>(initialMaterials);
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
   const [selected, setSelected] = useState<Material | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   const categoryMap = useMemo(
     () => Object.fromEntries(categories.map((c) => [c.id, c])),
@@ -50,6 +54,15 @@ export function MaterialsFilter({ materials, categories }: Props) {
   }, [materials, search, selectedCat, categoryMap]);
 
   const selectedCat2 = selected ? categoryMap[selected.category_id] : null;
+
+  function handleDelete(id: string) {
+    setDeletingId(id);
+    startTransition(async () => {
+      await deleteMaterial(id);
+      setMaterials((prev) => prev.filter((m) => m.id !== id));
+      setDeletingId(null);
+    });
+  }
 
   return (
     <>
@@ -92,12 +105,13 @@ export function MaterialsFilter({ materials, categories }: Props) {
               <th className="text-left font-medium text-muted-foreground px-4 py-3 w-32">FINISH</th>
               <th className="text-left font-medium text-muted-foreground px-4 py-3 w-36">SIZE</th>
               <th className="px-4 py-3 w-20 text-center font-medium text-muted-foreground">상세보기</th>
+              <th className="px-4 py-3 w-12" />
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-16 text-muted-foreground">
+                <td colSpan={6} className="text-center py-16 text-muted-foreground">
                   검색 결과가 없습니다.
                 </td>
               </tr>
@@ -130,6 +144,17 @@ export function MaterialsFilter({ materials, categories }: Props) {
                         onClick={() => setSelected(m)}
                       >
                         상세
+                      </Button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDelete(m.id)}
+                        disabled={deletingId === m.id}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </td>
                   </tr>

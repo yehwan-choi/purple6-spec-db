@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
-import { Search, Phone, Mail, Users, ExternalLink } from "lucide-react";
+import { Search, Phone, Mail, Users, ExternalLink, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { deleteDistributor } from "@/lib/actions";
 import type { Distributor } from "@/types";
 
 interface Props {
@@ -20,9 +21,21 @@ interface Props {
   specialties: string[];
 }
 
-export function DistributorsFilter({ distributors, specialties }: Props) {
+export function DistributorsFilter({ distributors: initialDistributors, specialties }: Props) {
+  const [distributors, setDistributors] = useState<Distributor[]>(initialDistributors);
   const [search, setSearch] = useState("");
   const [specialty, setSpecialty] = useState("all");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  function handleDelete(id: string) {
+    setDeletingId(id);
+    startTransition(async () => {
+      await deleteDistributor(id);
+      setDistributors((prev) => prev.filter((v) => v.id !== id));
+      setDeletingId(null);
+    });
+  }
 
   const filtered = useMemo(() => {
     return distributors.filter((v) => {
@@ -92,7 +105,18 @@ export function DistributorsFilter({ distributors, specialties }: Props) {
                   </Link>
                   <p className="text-xs text-muted-foreground mt-0.5">{v.address}</p>
                 </div>
-                <Badge variant="outline">{v.specialty}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{v.specialty}</Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDelete(v.id)}
+                    disabled={deletingId === v.id}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
 
               {v.note && (

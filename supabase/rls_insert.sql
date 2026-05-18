@@ -6,5 +6,8 @@ CREATE POLICY "anon insert" ON materials           FOR INSERT WITH CHECK (true);
 CREATE POLICY "anon insert" ON distributors        FOR INSERT WITH CHECK (true);
 CREATE POLICY "anon insert" ON projects            FOR INSERT WITH CHECK (true);
 
--- DELETE 권한 (카테고리 삭제)
+-- DELETE 권한
 CREATE POLICY "anon delete" ON material_categories FOR DELETE USING (true);
+CREATE POLICY "anon delete" ON materials           FOR DELETE USING (true);
+CREATE POLICY "anon delete" ON distributors        FOR DELETE USING (true);
+CREATE POLICY "anon delete" ON projects            FOR DELETE USING (true);

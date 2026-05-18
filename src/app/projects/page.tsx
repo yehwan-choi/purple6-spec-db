@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AddProjectModal } from "@/components/projects/AddProjectModal";
+import { DeleteProjectButton } from "@/components/projects/DeleteProjectButton";
 
 export const metadata = { title: "프로젝트 | 마감재 DB" };
 
@@ -20,11 +21,12 @@ export default async function ProjectsPage() {
       </div>
 
       <div className="rounded-xl border overflow-hidden">
-        <div className="grid grid-cols-[2fr_1fr_80px_60px_40px] items-center bg-muted/40 border-b px-4 py-3 text-xs font-medium text-muted-foreground">
+        <div className="grid grid-cols-[2fr_1fr_80px_60px_40px_36px] items-center bg-muted/40 border-b px-4 py-3 text-xs font-medium text-muted-foreground">
           <span>프로젝트명</span>
           <span>클라이언트</span>
           <span className="text-center">연도</span>
           <span className="text-center">자재</span>
+          <span />
           <span />
         </div>
 
@@ -35,14 +37,16 @@ export default async function ProjectsPage() {
             ).length;
 
             return (
-              <Link
+              <div
                 key={project.id}
-                href={`/projects/${project.id}`}
-                className="grid grid-cols-[2fr_1fr_80px_60px_40px] items-center px-4 py-3.5 text-sm hover:bg-muted/30 transition-colors group"
+                className="grid grid-cols-[2fr_1fr_80px_60px_40px_36px] items-center px-4 py-3.5 text-sm hover:bg-muted/30 transition-colors group"
               >
-                <span className="font-medium group-hover:underline underline-offset-4 truncate pr-4">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="font-medium hover:underline underline-offset-4 truncate pr-4"
+                >
                   {project.project_name}
-                </span>
+                </Link>
                 <span className="text-muted-foreground truncate pr-4">
                   {project.project_client}
                 </span>
@@ -55,7 +59,10 @@ export default async function ProjectsPage() {
                 <span className="flex justify-center">
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </span>
-              </Link>
+                <span className="flex justify-center">
+                  <DeleteProjectButton id={project.id} />
+                </span>
+              </div>
             );
           })}
         </div>

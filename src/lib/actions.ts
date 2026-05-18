@@ -71,6 +71,29 @@ export async function deleteMaterialCategory(id: string): Promise<ActionState> {
   return { success: true };
 }
 
+export async function deleteMaterial(id: string): Promise<ActionState> {
+  const { error } = await supabase.from("materials").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/materials");
+  return { success: true };
+}
+
+export async function deleteDistributor(id: string): Promise<ActionState> {
+  const { error } = await supabase.from("distributors").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/distributors");
+  revalidatePath("/distributors/material");
+  revalidatePath("/distributors/other");
+  return { success: true };
+}
+
+export async function deleteProject(id: string): Promise<ActionState> {
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/projects");
+  return { success: true };
+}
+
 export async function createProject(
   prevState: ActionState,
   formData: FormData
