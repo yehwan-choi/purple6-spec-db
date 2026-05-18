@@ -1,8 +1,8 @@
 import { getProjects, getAllProjectSpecs } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Plus, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { AddProjectModal } from "@/components/projects/AddProjectModal";
 
 export const metadata = { title: "프로젝트 | 마감재 DB" };
 
@@ -16,10 +16,7 @@ export default async function ProjectsPage() {
           <h1 className="text-2xl font-bold tracking-tight">프로젝트</h1>
           <p className="text-muted-foreground mt-1">스펙북 단위 프로젝트 관리</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          프로젝트 생성
-        </Button>
+        <AddProjectModal />
       </div>
 
       <div className="rounded-xl border overflow-hidden">

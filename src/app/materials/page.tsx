@@ -1,7 +1,6 @@
 import { getMaterials, getMaterialCategories } from "@/lib/data";
 import { MaterialsFilter } from "@/components/materials/MaterialsFilter";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { AddMaterialModal } from "@/components/materials/AddMaterialModal";
 
 export const metadata = { title: "마감재 등록 | 마감재 DB" };
 
@@ -18,10 +17,7 @@ export default async function MaterialsPage() {
           <h1 className="text-2xl font-bold tracking-tight">마감재 등록</h1>
           <p className="text-muted-foreground mt-1">등록된 자재 전체 목록 및 상세 정보</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          자재 등록
-        </Button>
+        <AddMaterialModal categories={categories} />
       </div>
 
       <MaterialsFilter

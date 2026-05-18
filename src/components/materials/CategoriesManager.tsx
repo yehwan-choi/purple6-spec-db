@@ -120,12 +120,6 @@ export function CategoriesManager({ initialCategories }: Props) {
         </Card>
       )}
 
-      {/* Phase 1 notice */}
-      <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0" />
-        Supabase 연동 전 — 새로 추가된 항목은 새로고침 시 초기화됩니다.
-      </div>
-
       {/* Table */}
       <div className="rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
