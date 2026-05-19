@@ -117,7 +117,8 @@ export async function deleteDistributor(id: string): Promise<ActionState> {
 export async function deleteProject(id: string): Promise<ActionState> {
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
-  revalidatePath("/projects");
+  revalidatePath("/projects/draft");
+  revalidatePath("/projects/completed");
   return { success: true };
 }
 
@@ -207,6 +208,31 @@ export async function removeMaterialFromDistributor(
   return { success: true };
 }
 
+// ── 프로젝트 스펙 CRUD ────────────────────────────────────────────────────────
+
+export async function addProjectSpec(
+  projectId: string,
+  data: { material_id: string; distributor_id: string; memo: string }
+): Promise<ActionState> {
+  const { error } = await supabase.from("project_specs").insert({
+    id: crypto.randomUUID(),
+    project_id: projectId,
+    material_id: data.material_id,
+    distributor_id: data.distributor_id,
+    memo: data.memo || "",
+  });
+  if (error) return { success: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { success: true };
+}
+
+export async function deleteProjectSpec(specId: string, projectId: string): Promise<ActionState> {
+  const { error } = await supabase.from("project_specs").delete().eq("id", specId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { success: true };
+}
+
 // ── 프로젝트 ↔ 업체 링크 (project_specs 경유) ────────────────────────────────
 
 export async function addProjectToDistributor(
@@ -247,9 +273,25 @@ export async function createProject(
     project_client: (formData.get("project_client") as string) || null,
     project_year:
       Number(formData.get("project_year")) || new Date().getFullYear(),
+    status: "draft",
   });
   if (error) return { success: false, error: error.message };
-  revalidatePath("/projects");
+  revalidatePath("/projects/draft");
+  return { success: true };
+}
+
+export async function updateProjectStatus(
+  id: string,
+  status: "draft" | "completed"
+): Promise<ActionState> {
+  const { error } = await supabase
+    .from("projects")
+    .update({ status })
+    .eq("id", id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/projects/draft");
+  revalidatePath("/projects/completed");
+  revalidatePath(`/projects/${id}`);
   return { success: true };
 }
 

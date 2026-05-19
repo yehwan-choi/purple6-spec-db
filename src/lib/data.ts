@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Material, MaterialCategory, Distributor, DistributorTypeRecord, Project, ProjectSpec } from "@/types";
+import type { Material, MaterialCategory, Distributor, DistributorTypeRecord, Project, ProjectSpec, MaterialDistributorLink } from "@/types";
 
 export async function getMaterials(): Promise<Material[]> {
   const { data, error } = await supabase.from("materials").select("*").order("material_item");
@@ -59,6 +59,16 @@ export async function getProjects(): Promise<Project[]> {
   return data;
 }
 
+export async function getProjectsByStatus(status: "draft" | "completed"): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("status", status)
+    .order("project_year", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 export async function getProjectById(id: string): Promise<Project | null> {
   const { data, error } = await supabase.from("projects").select("*").eq("id", id).single();
   if (error) return null;
@@ -81,6 +91,12 @@ export async function getMaterialsForDistributor(distributorId: string): Promise
     .eq("distributor_id", distributorId);
   if (error) throw error;
   return (data.map((row) => row.material).filter(Boolean)) as unknown as Material[];
+}
+
+export async function getMaterialDistributorLinks(): Promise<MaterialDistributorLink[]> {
+  const { data, error } = await supabase.from("material_distributor_links").select("*");
+  if (error) throw error;
+  return data;
 }
 
 export async function getAllProjectSpecs(): Promise<ProjectSpec[]> {

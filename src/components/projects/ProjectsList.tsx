@@ -6,17 +6,16 @@ import { Button } from "@/components/ui/button";
 import { SortIcon } from "@/components/ui/sort-icon";
 import { Trash2 } from "lucide-react";
 import { deleteProject } from "@/lib/actions";
-import type { Project, ProjectSpec } from "@/types";
+import type { Project } from "@/types";
 
 type SortKey = "project_name" | "project_client" | "project_year";
 type SortDir = "asc" | "desc";
 
 interface Props {
   projects: Project[];
-  allSpecs: ProjectSpec[];
 }
 
-export function ProjectsList({ projects: initialProjects, allSpecs }: Props) {
+export function ProjectsList({ projects: initialProjects }: Props) {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();

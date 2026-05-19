@@ -7,14 +7,14 @@ import {
   Layers,
   Building2,
   FolderOpen,
-  BookOpen,
   ChevronDown,
-  ChevronRight,
   Tag,
   Package,
   Truck,
   Wrench,
   Settings2,
+  FilePlus,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -88,14 +88,17 @@ export function Sidebar() {
   const pathname = usePathname();
   const [materialsOpenPref, setMaterialsOpenPref] = useState(false);
   const [distributorsOpenPref, setDistributorsOpenPref] = useState(false);
+  const [projectsOpenPref, setProjectsOpenPref] = useState(false);
   const [masterOpenPref, setMasterOpenPref] = useState(false);
 
   const onMaterialsPath = pathname.startsWith("/materials") && !pathname.startsWith("/materials/categories");
   const onDistributorsPath = pathname.startsWith("/distributors") && !pathname.startsWith("/distributors/types");
+  const onProjectsPath = pathname.startsWith("/projects");
   const onMasterPath = pathname.startsWith("/materials/categories") || pathname.startsWith("/distributors/types");
 
   const materialsOpen = materialsOpenPref || onMaterialsPath;
   const distributorsOpen = distributorsOpenPref || onDistributorsPath;
+  const projectsOpen = projectsOpenPref || onProjectsPath;
   const masterOpen = masterOpenPref || onMasterPath;
 
   const materialSubItems = [
@@ -107,14 +110,14 @@ export function Sidebar() {
     { label: "기타 업체", href: "/distributors/other", icon: Wrench },
   ];
 
+  const projectSubItems = [
+    { label: "신규 프로젝트 SPEC 작성", href: "/projects/draft", icon: FilePlus },
+    { label: "준공 프로젝트 SPEC 정보", href: "/projects/completed", icon: Archive },
+  ];
+
   const masterSubItems = [
     { label: "카테고리 관리", href: "/materials/categories", icon: Tag },
     { label: "업체 구분 관리", href: "/distributors/types", icon: Building2 },
-  ];
-
-  const bottomNavItems = [
-    { label: "스펙북 작성", href: "/specbook", icon: BookOpen },
-    { label: "프로젝트 스펙 정보", href: "/projects", icon: FolderOpen },
   ];
 
   return (
@@ -138,28 +141,15 @@ export function Sidebar() {
           subItems={distributorSubItems}
           pathname={pathname}
         />
-        {bottomNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              <span className="flex-1 font-medium whitespace-nowrap">{item.label}</span>
-              {!isActive && (
-                <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-60 transition-opacity" />
-              )}
-            </Link>
-          );
-        })}
+        <CollapsibleMenu
+          icon={FolderOpen}
+          label="프로젝트 SPEC 관리"
+          isActive={onProjectsPath}
+          isOpen={projectsOpen}
+          onToggle={() => setProjectsOpenPref((v) => !v)}
+          subItems={projectSubItems}
+          pathname={pathname}
+        />
       </nav>
 
       {/* 기준정보 관리 — 하단 고정 */}

@@ -51,6 +51,7 @@ export interface Project {
   project_name: string;
   project_client: string;
   project_year: number;
+  status: "draft" | "completed";
 }
 
 export interface ProjectSpec {
