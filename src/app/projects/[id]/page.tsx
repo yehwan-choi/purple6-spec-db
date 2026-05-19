@@ -6,7 +6,6 @@ import {
   getMaterials,
   getMaterialCategories,
   getDistributors,
-  getMaterialDistributorLinks,
 } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,13 +19,12 @@ interface Props {
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { id } = await params;
-  const [project, specItems, materials, categories, distributors, links] = await Promise.all([
+  const [project, specItems, materials, categories, distributors] = await Promise.all([
     getProjectById(id),
     getProjectSpecsWithDetails(id),
     getMaterials(),
     getMaterialCategories(),
     getDistributors(),
-    getMaterialDistributorLinks(),
   ]);
   if (!project) notFound();
 
@@ -72,7 +70,6 @@ export default async function ProjectDetailPage({ params }: Props) {
             materials={materials}
             categories={categories}
             distributors={distributors}
-            links={links}
           />
         </CardContent>
       </Card>

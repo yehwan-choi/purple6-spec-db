@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { useState, useRef, useTransition } from "react";
+import { Check, Search } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   Select,
   SelectContent,
@@ -34,7 +25,6 @@ import type {
   MaterialCategory,
   DistributorContact,
   Distributor,
-  MaterialDistributorLink,
 } from "@/types";
 
 type SpecItem = ProjectSpec & {
@@ -50,7 +40,6 @@ interface Props {
   materials: Material[];
   categories: MaterialCategory[];
   distributors: Distributor[];
-  links: MaterialDistributorLink[];
   onSaved: () => void;
 }
 
@@ -85,6 +74,91 @@ function Field({
   );
 }
 
+function SearchCombobox({
+  value,
+  placeholder,
+  searchPlaceholder,
+  items,
+  onSelect,
+  displayValue,
+  disabled,
+}: {
+  value: string | null;
+  placeholder: string;
+  searchPlaceholder: string;
+  items: { id: string; label: string; sub?: string }[];
+  onSelect: (id: string) => void;
+  displayValue: string | null;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filtered = items.filter((item) =>
+    `${item.label} ${item.sub ?? ""}`.toLowerCase().includes(query.toLowerCase())
+  );
+
+  function handleSelect(id: string) {
+    onSelect(id);
+    setOpen(false);
+    setQuery("");
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        className={cn(
+          "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring",
+          disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-accent/5"
+        )}
+        onClick={() => !disabled && setOpen((prev) => !prev)}
+      >
+        <span className={cn(displayValue ? "text-foreground" : "text-muted-foreground")}>
+          {displayValue ?? placeholder}
+        </span>
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 rounded-md border bg-popover shadow-lg">
+          <div className="p-2 border-b">
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto py-1">
+            {filtered.length === 0 ? (
+              <p className="px-3 py-2 text-sm text-muted-foreground">검색 결과가 없습니다.</p>
+            ) : (
+              filtered.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                  onMouseDown={(e) => { e.preventDefault(); handleSelect(item.id); }}
+                >
+                  <Check className={cn("h-4 w-4 shrink-0", value === item.id ? "opacity-100" : "opacity-0")} />
+                  <div className="text-left">
+                    <div>{item.label}</div>
+                    {item.sub && <div className="text-xs text-muted-foreground">{item.sub}</div>}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function EditSpecModal({
   spec,
   projectId,
@@ -93,10 +167,12 @@ export function EditSpecModal({
   materials,
   categories,
   distributors,
-  links,
   onSaved,
 }: Props) {
-  const [comboOpen, setComboOpen] = useState(false);
+  const initialMaterial = materials.find((m) => m.id === spec.material_id) ?? null;
+  const initialCategoryId = initialMaterial?.category_id ?? null;
+
+  const [categoryId, setCategoryId] = useState<string | null>(initialCategoryId);
   const [materialId, setMaterialId] = useState(spec.material_id);
   const [distributorId, setDistributorId] = useState(spec.distributor_id);
   const [contactId, setContactId] = useState<string | null>(spec.contact_id);
@@ -110,25 +186,42 @@ export function EditSpecModal({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  const selectedCategory = categories.find((c) => c.id === categoryId) ?? null;
+  const filteredMaterials = categoryId
+    ? materials.filter((m) => m.category_id === categoryId)
+    : [];
   const selectedMaterial = materials.find((m) => m.id === materialId) ?? null;
-  const selectedCategory = selectedMaterial
-    ? categories.find((c) => c.id === selectedMaterial.category_id) ?? null
-    : null;
+  const selectedDistributor = distributors.find((d) => d.id === distributorId) ?? null;
 
-  const linkedDistributorIds = links
-    .filter((l) => l.material_id === materialId)
-    .map((l) => l.distributor_id);
-  const linkedDistributors = distributors.filter((d) => linkedDistributorIds.includes(d.id));
-  const selectedDistributor = linkedDistributors.find((d) => d.id === distributorId) ?? null;
+  const categoryItems = categories.map((c) => ({
+    id: c.id,
+    label: c.category_eng,
+    sub: c.category_kor,
+  }));
+
+  const materialItems = filteredMaterials.map((m) => ({
+    id: m.id,
+    label: m.material_item,
+    sub: [m.material_finish, m.material_size].filter(Boolean).join(" · "),
+  }));
+
+  const distributorItems = distributors.map((d) => ({
+    id: d.id,
+    label: d.company_name,
+  }));
+
+  function handleCategorySelect(id: string) {
+    setCategoryId(id);
+    setMaterialId("");
+    setContactId(null);
+  }
 
   function handleMaterialSelect(id: string) {
     setMaterialId(id);
-    setDistributorId("");
     setContactId(null);
-    setComboOpen(false);
   }
 
-  function handleDistributorChange(id: string) {
+  function handleDistributorSelect(id: string) {
     setDistributorId(id);
     setContactId(null);
   }
@@ -161,58 +254,44 @@ export function EditSpecModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[88vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>추가 정보 입력</DialogTitle>
         </DialogHeader>
-        <div className="space-y-5 px-6 pb-6">
+        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6 space-y-5">
 
-          {/* 자재 선택 */}
+          {/* 1단계: 카테고리 선택 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">자재 *</label>
-            <Popover open={comboOpen} onOpenChange={setComboOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={comboOpen}
-                  className="w-full justify-between font-normal"
-                >
-                  {selectedMaterial ? selectedMaterial.material_item : "자재를 검색하세요"}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[420px] p-0">
-                <Command>
-                  <CommandInput placeholder="자재명 검색..." />
-                  <CommandList>
-                    <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
-                    <CommandGroup>
-                      {materials.map((m) => (
-                        <CommandItem
-                          key={m.id}
-                          value={`${m.material_item} ${m.material_finish ?? ""} ${m.material_size ?? ""}`}
-                          onSelect={() => handleMaterialSelect(m.id)}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4 shrink-0",
-                              materialId === m.id ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          <div>
-                            <div className="font-medium">{m.material_item}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {[m.material_finish, m.material_size].filter(Boolean).join(" · ")}
-                            </div>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <label className="text-sm font-medium">카테고리 *</label>
+            <SearchCombobox
+              value={categoryId}
+              placeholder="카테고리를 검색하세요"
+              searchPlaceholder="카테고리 검색..."
+              items={categoryItems}
+              onSelect={handleCategorySelect}
+              displayValue={selectedCategory ? `${selectedCategory.category_eng} · ${selectedCategory.category_kor}` : null}
+            />
+          </div>
+
+          {/* 2단계: 자재 선택 */}
+          <div className="space-y-1.5">
+            <label className={cn("text-sm font-medium", !categoryId && "text-muted-foreground")}>
+              자재 *
+            </label>
+            {!categoryId ? (
+              <p className="text-sm text-muted-foreground py-1">카테고리를 먼저 선택해주세요.</p>
+            ) : filteredMaterials.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-1">해당 카테고리에 등록된 자재가 없습니다.</p>
+            ) : (
+              <SearchCombobox
+                value={materialId || null}
+                placeholder="자재를 검색하세요"
+                searchPlaceholder="자재명 검색..."
+                items={materialItems}
+                onSelect={handleMaterialSelect}
+                displayValue={selectedMaterial?.material_item ?? null}
+              />
+            )}
           </div>
 
           {/* 자재 정보 자동 표시 */}
@@ -243,22 +322,14 @@ export function EditSpecModal({
           {/* 업체 선택 */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium">업체 *</label>
-            {!materialId ? (
-              <p className="text-sm text-muted-foreground py-1">자재를 먼저 선택해주세요.</p>
-            ) : linkedDistributors.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-1">연결된 업체가 없습니다.</p>
-            ) : (
-              <Select value={distributorId} onValueChange={handleDistributorChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="업체를 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  {linkedDistributors.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.company_name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <SearchCombobox
+              value={distributorId || null}
+              placeholder="업체를 검색하세요"
+              searchPlaceholder="업체명 검색..."
+              items={distributorItems}
+              onSelect={handleDistributorSelect}
+              displayValue={selectedDistributor?.company_name ?? null}
+            />
           </div>
 
           {/* 담당자 선택 */}

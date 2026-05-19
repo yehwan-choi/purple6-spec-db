@@ -13,7 +13,6 @@ import type {
   MaterialCategory,
   DistributorContact,
   Distributor,
-  MaterialDistributorLink,
 } from "@/types";
 
 type SpecItem = ProjectSpec & {
@@ -28,7 +27,6 @@ interface Props {
   materials: Material[];
   categories: MaterialCategory[];
   distributors: Distributor[];
-  links: MaterialDistributorLink[];
 }
 
 export function SpecbookTable({
@@ -38,7 +36,6 @@ export function SpecbookTable({
   materials,
   categories,
   distributors,
-  links,
 }: Props) {
   const router = useRouter();
   const [deletedIds, setDeletedIds] = useState(new Set<string>());
@@ -67,7 +64,6 @@ export function SpecbookTable({
             materials={materials}
             categories={categories}
             distributors={distributors}
-            links={links}
             onAdded={() => router.refresh()}
           />
         </div>
@@ -93,7 +89,7 @@ export function SpecbookTable({
               </tr>
             </thead>
             <tbody>
-              {items.map((item, idx) => {
+              {items.map((item) => {
                 const { material, distributor } = item;
                 const category = material?.category ?? null;
                 const contact = item.contact_id
@@ -174,7 +170,6 @@ export function SpecbookTable({
           materials={materials}
           categories={categories}
           distributors={distributors}
-          links={links}
           onSaved={() => router.refresh()}
         />
       )}
