@@ -85,6 +85,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
           company_name: (formData.get("company_name") as string) || "",
           address: (formData.get("address") as string) || "",
           note: (formData.get("note") as string) || "",
+          homepage: (formData.get("homepage") as string) || null,
           contacts: builtContacts,
         });
         setOpen(false);
@@ -137,6 +138,11 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
           <div className="space-y-1.5">
             <label className="text-sm font-medium">주소</label>
             <Input name="address" placeholder="주소 입력" />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">홈페이지</label>
+            <Input name="homepage" placeholder="https://example.com" />
           </div>
 
           <div className="space-y-1.5">

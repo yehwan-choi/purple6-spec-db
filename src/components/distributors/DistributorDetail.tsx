@@ -219,6 +219,22 @@ export function DistributorDetail({
         )}
       </div>
 
+      {/* ── 홈페이지 ─────────────────────────────────────── */}
+      {distributor.homepage && (
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">홈페이지</h2>
+          <a
+            href={distributor.homepage}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+            {distributor.homepage}
+          </a>
+        </div>
+      )}
+
       {/* ── 담당자 ───────────────────────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -227,7 +243,7 @@ export function DistributorDetail({
           </h2>
           {!addingContact && (
             <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAddingContact(true)}>
-              <Plus className="h-3 w-3" /> 추가
+              <Plus className="h-3 w-3" /> 담당자 추가
             </Button>
           )}
         </div>

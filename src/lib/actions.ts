@@ -29,8 +29,8 @@ export async function createMaterial(
     id,
     category_id: formData.get("category_id") as string,
     material_item: formData.get("material_item") as string,
-    material_finish: (formData.get("material_finish") as string) || null,
-    material_size: (formData.get("material_size") as string) || null,
+    material_finish: (formData.get("material_finish") as string) || "-",
+    material_size: (formData.get("material_size") as string) || "-",
     material_image,
   });
   if (error) return { success: false, error: error.message };
@@ -49,6 +49,7 @@ export async function createDistributor(
     company_name: formData.get("company_name") as string,
     address: (formData.get("address") as string) || null,
     note: (formData.get("note") as string) || null,
+    homepage: (formData.get("homepage") as string) || null,
   });
   if (error) return { success: false, error: error.message };
 

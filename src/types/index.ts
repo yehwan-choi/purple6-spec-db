@@ -38,6 +38,7 @@ export interface Distributor {
   company_name: string;
   address: string;
   note: string;
+  homepage: string | null;
   contacts: DistributorContact[];
 }
 

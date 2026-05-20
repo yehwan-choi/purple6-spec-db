@@ -149,7 +149,7 @@ export function DistributorsFilter({
                 </button>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-medium text-muted-foreground">주소</span>
+                <span className="text-xs font-medium text-muted-foreground">비고</span>
               </th>
               <th className="px-4 py-3 text-left">
                 <button onClick={() => toggleSort("contacts")} className={thClass}>
@@ -172,22 +172,16 @@ export function DistributorsFilter({
                 <tr key={v.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3">
                     <span className="font-medium">{v.company_name}</span>
-                    {v.note && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{v.note}</p>
-                    )}
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs">
-                    {v.address || "-"}
+                  <td className="px-4 py-3 text-muted-foreground text-xs max-w-xs">
+                    <span className="line-clamp-2">{v.note || "-"}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Users className="h-3.5 w-3.5 shrink-0" />
                       <span>{v.contacts.length}명</span>
-                      {v.contacts.length > 0 && (
-                        <span className="text-foreground">
-                          {v.contacts.slice(0, 2).map((c) => c.name).join(", ")}
-                          {v.contacts.length > 2 && ` 외 ${v.contacts.length - 2}명`}
-                        </span>
+                      {v.contacts[0] && (
+                        <span className="text-foreground">{v.contacts[0].name}</span>
                       )}
                     </div>
                   </td>
