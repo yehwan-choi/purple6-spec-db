@@ -50,6 +50,7 @@ export function DistributorDetail({
   distributorTypes,
 }: Props) {
   const [, startTransition] = useTransition();
+  const [isPendingInfo, startInfoTransition] = useTransition();
 
   // ── 비고 / 홈페이지 ──────────────────────────────────
   const [note, setNote] = useState(distributor.note ?? "");
@@ -57,20 +58,25 @@ export function DistributorDetail({
   const [editingInfo, setEditingInfo] = useState(false);
   const [noteInput, setNoteInput] = useState("");
   const [homepageInput, setHomepageInput] = useState("");
+  const [infoError, setInfoError] = useState<string | null>(null);
 
   function startEditInfo() {
     setNoteInput(note);
     setHomepageInput(homepage);
+    setInfoError(null);
     setEditingInfo(true);
   }
 
   function handleSaveInfo() {
-    startTransition(async () => {
+    setInfoError(null);
+    startInfoTransition(async () => {
       const result = await updateDistributorInfo(distributor.id, { note: noteInput, homepage: homepageInput });
       if (result?.success) {
         setNote(noteInput);
         setHomepage(homepageInput);
         setEditingInfo(false);
+      } else {
+        setInfoError(result?.error ?? "저장에 실패했습니다.");
       }
     });
   }
@@ -81,6 +87,11 @@ export function DistributorDetail({
   const [editForm, setEditForm] = useState({ name: "", role: "", phone: "", email: "" });
   const [addingContact, setAddingContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: "", role: "", phone: "", email: "" });
+
+  function closeAddingContact() {
+    setAddingContact(false);
+    setNewContact({ name: "", role: "", phone: "", email: "" });
+  }
 
   // ── 마감재 ───────────────────────────────────────────
   const [materials, setMaterials] = useState<Material[]>(initialMaterials);
@@ -249,10 +260,10 @@ export function DistributorDetail({
             </Button>
           ) : (
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:text-primary" onClick={handleSaveInfo}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:text-primary" onClick={handleSaveInfo} disabled={isPendingInfo}>
                 <Check className="h-3.5 w-3.5" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => setEditingInfo(false)}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => { setEditingInfo(false); setInfoError(null); }} disabled={isPendingInfo}>
                 <X className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -298,6 +309,9 @@ export function DistributorDetail({
             <p className="text-sm text-muted-foreground">-</p>
           )}
         </div>
+
+        {infoError && <p className="text-xs text-destructive">{infoError}</p>}
+        {isPendingInfo && <p className="text-xs text-muted-foreground">저장 중...</p>}
       </div>
 
       {/* ── 담당자 ───────────────────────────────────────── */}
@@ -306,11 +320,17 @@ export function DistributorDetail({
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             담당자 ({contacts.length}명)
           </h2>
-          {!addingContact && (
-            <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAddingContact(true)}>
-              <Plus className="h-3 w-3" /> 담당자 추가
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {!addingContact ? (
+              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAddingContact(true)}>
+                <Plus className="h-3 w-3" /> 담당자 추가
+              </Button>
+            ) : (
+              <Button variant="default" size="sm" className="h-7 text-xs" onClick={closeAddingContact}>
+                완료
+              </Button>
+            )}
+          </div>
         </div>
         <div className="border-t">
           <table className="w-full text-sm">
@@ -405,7 +425,7 @@ export function DistributorDetail({
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:text-primary" onClick={handleAddContact}>
                         <Check className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => { setAddingContact(false); setNewContact({ name: "", role: "", phone: "", email: "" }); }}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={closeAddingContact}>
                         <X className="h-3.5 w-3.5" />
                       </Button>
                     </div>
