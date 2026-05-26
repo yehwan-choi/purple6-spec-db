@@ -27,9 +27,10 @@ type SortDir = "asc" | "desc";
 interface Props {
   materials: Material[];
   categories: MaterialCategory[];
+  distributorLinkMap?: Map<string, string[]>;
 }
 
-export function MaterialsFilter({ materials: initialMaterials, categories }: Props) {
+export function MaterialsFilter({ materials: initialMaterials, categories, distributorLinkMap = new Map() }: Props) {
   const [materials, setMaterials] = useState<Material[]>(initialMaterials);
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
@@ -193,6 +194,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                   자재명 <SortIcon active={sortKey === "material_item"} dir={sortDir} />
                 </button>
               </th>
+              <th className="px-4 py-3 w-36 text-center text-xs font-medium text-muted-foreground">공급업체</th>
               <th className="px-4 py-3 w-32">
                 <button onClick={() => toggleSort("material_finish")} className={thClass}>
                   FINISH <SortIcon active={sortKey === "material_finish"} dir={sortDir} />
@@ -210,7 +212,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-16 text-muted-foreground">
+                <td colSpan={8} className="text-center py-16 text-muted-foreground">
                   검색 결과가 없습니다.
                 </td>
               </tr>
@@ -239,6 +241,19 @@ export function MaterialsFilter({ materials: initialMaterials, categories }: Pro
                       )}
                     </td>
                     <td className="px-4 py-2 font-medium text-center">{m.material_item}</td>
+                    <td className="px-4 py-2 text-center">
+                      {(distributorLinkMap.get(m.id) ?? []).length > 0 ? (
+                        <div className="flex flex-wrap justify-center gap-1">
+                          {(distributorLinkMap.get(m.id) ?? []).map((name) => (
+                            <span key={name} className="inline-block rounded-full border border-muted bg-muted/40 px-2 py-px text-[10px] text-muted-foreground">
+                              {name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </td>
                     <td className="px-4 py-2 text-sm text-muted-foreground text-center">{m.material_finish || "-"}</td>
                     <td className="px-4 py-2 text-xs text-muted-foreground font-mono text-center">{m.material_size || "-"}</td>
                     <td className="px-4 py-2 text-center">

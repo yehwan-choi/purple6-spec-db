@@ -110,6 +110,33 @@ export async function getMaterialsForDistributor(distributorId: string): Promise
   return (data.map((row) => row.material).filter(Boolean)) as unknown as Material[];
 }
 
+// 마감재 리스트: 자재 ID별 공급업체명 맵 (material_id → company_name[])
+export async function getMaterialDistributorNameLinks(): Promise<{ material_id: string; company_name: string }[]> {
+  const { data, error } = await supabase
+    .from("material_distributor_links")
+    .select("material_id, distributor:distributors(company_name)");
+  if (error) throw error;
+  return (data as unknown as { material_id: string; distributor: { company_name: string } }[])
+    .map((r) => ({ material_id: r.material_id, company_name: r.distributor.company_name }));
+}
+
+// 마감재 업체 타입인 업체 목록
+export async function getMaterialTypeDistributors(): Promise<Distributor[]> {
+  const { data: types, error: tErr } = await supabase
+    .from("distributor_types")
+    .select("id")
+    .eq("is_material", true);
+  if (tErr) throw tErr;
+  if (!types?.length) return [];
+  const { data, error } = await supabase
+    .from("distributors")
+    .select("*, contacts:distributor_contacts(*)")
+    .in("distributor_type", types.map((t) => t.id))
+    .order("company_name");
+  if (error) throw error;
+  return data as Distributor[];
+}
+
 // 프로젝트 상세 페이지: specs + 중첩된 material(category 포함) + distributor(contacts 포함)를 한 번에 조회
 export async function getProjectSpecsWithDetails(projectId: string) {
   const { data, error } = await supabase

@@ -34,6 +34,17 @@ export async function createMaterial(
     material_image,
   });
   if (error) return { success: false, error: error.message };
+
+  const distributorIdsJson = formData.get("distributor_ids") as string;
+  if (distributorIdsJson) {
+    const distributorIds = JSON.parse(distributorIdsJson) as string[];
+    const rows = distributorIds.map((distributor_id) => ({ material_id: id, distributor_id }));
+    if (rows.length > 0) {
+      const { error: linkErr } = await supabase.from("material_distributor_links").insert(rows);
+      if (linkErr) return { success: false, error: linkErr.message };
+    }
+  }
+
   revalidatePath("/materials");
   return { success: true };
 }
