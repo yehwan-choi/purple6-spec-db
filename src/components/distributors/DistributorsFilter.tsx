@@ -6,10 +6,11 @@ import { Search, Users, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SortIcon } from "@/components/ui/sort-icon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { deleteDistributor } from "@/lib/actions";
 import { AddDistributorModal } from "@/components/distributors/AddDistributorModal";
-import type { Distributor, DistributorTypeRecord } from "@/types";
+import type { Distributor, DistributorTypeRecord, MaterialCategory } from "@/types";
 
 type SortKey = "company_name" | "contacts";
 type SortDir = "asc" | "desc";
@@ -19,6 +20,7 @@ interface Props {
   distributorTypes: DistributorTypeRecord[];
   defaultType?: string;
   lockModal?: boolean;
+  categoryLinkMap?: Map<string, MaterialCategory[]>;
 }
 
 export function DistributorsFilter({
@@ -26,6 +28,7 @@ export function DistributorsFilter({
   distributorTypes,
   defaultType,
   lockModal = false,
+  categoryLinkMap = new Map(),
 }: Props) {
   const [distributors, setDistributors] = useState<Distributor[]>(initialDistributors);
   const [activeTab, setActiveTab] = useState<string>(defaultType ?? distributorTypes[0]?.id ?? "");
@@ -34,6 +37,7 @@ export function DistributorsFilter({
   const [, startTransition] = useTransition();
   const [sortKey, setSortKey] = useState<SortKey>("company_name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -58,16 +62,32 @@ export function DistributorsFilter({
     [distributors, activeTab]
   );
 
+  const availableCategories = useMemo(() => {
+    const seen = new Set<string>();
+    const cats: MaterialCategory[] = [];
+    for (const d of byTab) {
+      for (const cat of (categoryLinkMap.get(d.id) ?? [])) {
+        if (!seen.has(cat.id)) { seen.add(cat.id); cats.push(cat); }
+      }
+    }
+    return cats.sort((a, b) => a.category_kor.localeCompare(b.category_kor, "ko"));
+  }, [byTab, categoryLinkMap]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return byTab.filter(
-      (v) =>
+    return byTab.filter((v) => {
+      if (selectedCategory !== "all") {
+        const cats = categoryLinkMap.get(v.id) ?? [];
+        if (!cats.some((c) => c.id === selectedCategory)) return false;
+      }
+      return (
         !q ||
         v.company_name.toLowerCase().includes(q) ||
         (v.address ?? "").toLowerCase().includes(q) ||
         v.contacts.some((c) => c.name.toLowerCase().includes(q) || (c.role ?? "").toLowerCase().includes(q))
-    );
-  }, [byTab, search]);
+      );
+    });
+  }, [byTab, search, selectedCategory, categoryLinkMap]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -104,7 +124,7 @@ export function DistributorsFilter({
           {distributorTypes.map((t) => (
             <button
               key={t.id}
-              onClick={() => { setActiveTab(t.id); setSearch(""); }}
+              onClick={() => { setActiveTab(t.id); setSearch(""); setSelectedCategory("all"); }}
               className={cn(
                 "px-5 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
                 activeTab === t.id
@@ -135,6 +155,19 @@ export function DistributorsFilter({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        {availableCategories.length > 0 && (
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-40 h-9 text-sm">
+              <SelectValue placeholder="카테고리" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 카테고리</SelectItem>
+              {availableCategories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>{cat.category_kor}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         <span className="text-sm text-muted-foreground ml-auto">{sorted.length}개 업체</span>
       </div>
 
@@ -172,6 +205,18 @@ export function DistributorsFilter({
                 <tr key={v.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3">
                     <span className="font-medium">{v.company_name}</span>
+                    {(categoryLinkMap.get(v.id) ?? []).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {(categoryLinkMap.get(v.id) ?? []).map((cat) => (
+                          <span
+                            key={cat.id}
+                            className="inline-block rounded-full border border-primary/30 bg-primary/5 px-2 py-px text-[10px] font-medium text-primary"
+                          >
+                            {cat.category_kor}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs max-w-xs">
                     <span className="line-clamp-2">{v.note || "-"}</span>

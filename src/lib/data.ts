@@ -75,6 +75,14 @@ export async function getProjectById(id: string): Promise<Project | null> {
   return data;
 }
 
+export async function getAllDistributorCategoryLinks(): Promise<{ distributor_id: string; category: MaterialCategory }[]> {
+  const { data, error } = await supabase
+    .from("distributor_category_links")
+    .select("distributor_id, category:material_categories(*)");
+  if (error) throw error;
+  return data as unknown as { distributor_id: string; category: MaterialCategory }[];
+}
+
 export async function getCategoriesForDistributor(distributorId: string): Promise<MaterialCategory[]> {
   const { data, error } = await supabase
     .from("distributor_category_links")
