@@ -153,12 +153,10 @@ export async function updateDistributorInfo(
 ): Promise<ActionState> {
   const { error } = await supabase
     .from("distributors")
-    .update({
-      note: data.note || null,
-      homepage: data.homepage || null,
-    })
+    .update({ note: data.note || null, homepage: data.homepage || null })
     .eq("id", id);
   if (error) return { success: false, error: error.message };
+
   revalidatePath(`/distributors/${id}`);
   return { success: true };
 }
@@ -205,11 +203,13 @@ export async function createDistributorContact(
     email: data.email.trim() || null,
   });
   if (error) return { success: false, error: error.message };
+  revalidatePath(`/distributors/${distributorId}`);
   return { success: true };
 }
 
 export async function updateDistributorContact(
   id: string,
+  distributorId: string,
   data: { name: string; role: string; phone: string; email: string }
 ): Promise<ActionState> {
   const { error } = await supabase
@@ -222,12 +222,14 @@ export async function updateDistributorContact(
     })
     .eq("id", id);
   if (error) return { success: false, error: error.message };
+  revalidatePath(`/distributors/${distributorId}`);
   return { success: true };
 }
 
-export async function deleteDistributorContact(id: string): Promise<ActionState> {
+export async function deleteDistributorContact(id: string, distributorId: string): Promise<ActionState> {
   const { error } = await supabase.from("distributor_contacts").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
+  revalidatePath(`/distributors/${distributorId}`);
   return { success: true };
 }
 
@@ -334,34 +336,6 @@ export async function deleteProjectSpec(specId: string, projectId: string): Prom
   const { error } = await supabase.from("project_specs").delete().eq("id", specId);
   if (error) return { success: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
-  return { success: true };
-}
-
-// ── 프로젝트 ↔ 업체 링크 (project_specs 경유) ────────────────────────────────
-
-export async function addProjectToDistributor(
-  distributorId: string,
-  projectId: string
-): Promise<ActionState> {
-  const { error } = await supabase.from("project_specs").insert({
-    id: crypto.randomUUID(),
-    project_id: projectId,
-    distributor_id: distributorId,
-  });
-  if (error) return { success: false, error: error.message };
-  return { success: true };
-}
-
-export async function removeProjectFromDistributor(
-  distributorId: string,
-  projectId: string
-): Promise<ActionState> {
-  const { error } = await supabase
-    .from("project_specs")
-    .delete()
-    .eq("project_id", projectId)
-    .eq("distributor_id", distributorId);
-  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 

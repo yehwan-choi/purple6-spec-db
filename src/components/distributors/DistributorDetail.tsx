@@ -22,8 +22,6 @@ import {
   deleteDistributorContact,
   addMaterialToDistributor,
   removeMaterialFromDistributor,
-  addProjectToDistributor,
-  removeProjectFromDistributor,
   updateDistributorInfo,
 } from "@/lib/actions";
 import type { Distributor, DistributorContact, DistributorTypeRecord, Material, MaterialCategory, Project } from "@/types";
@@ -35,7 +33,6 @@ interface Props {
   initialMaterials: Material[];
   initialProjects: Project[];
   allMaterials: Material[];
-  allProjects: Project[];
   categoryMap: Map<string, MaterialCategory>;
   distributorTypes: DistributorTypeRecord[];
 }
@@ -45,7 +42,6 @@ export function DistributorDetail({
   initialMaterials,
   initialProjects,
   allMaterials,
-  allProjects,
   categoryMap,
   distributorTypes,
 }: Props) {
@@ -95,11 +91,10 @@ export function DistributorDetail({
   const [materialPage, setMaterialPage] = useState(0);
   const [materialPickerOpen, setMaterialPickerOpen] = useState(false);
 
-  // ── 프로젝트 ─────────────────────────────────────────
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  // ── 프로젝트 (읽기 전용 — project_specs 에서 파생됨) ──
+  const [projects] = useState<Project[]>(initialProjects);
   const [projectSearch, setProjectSearch] = useState("");
   const [projectPage, setProjectPage] = useState(0);
-  const [projectPickerOpen, setProjectPickerOpen] = useState(false);
 
   // ── 담당자 handlers ──────────────────────────────────
   function startEditContact(c: DistributorContact) {
@@ -115,7 +110,7 @@ export function DistributorDetail({
       return;
     }
     startTransition(async () => {
-      const result = await updateDistributorContact(id, editForm);
+      const result = await updateDistributorContact(id, distributor.id, editForm);
       if (result?.success) {
         setContacts((prev) => prev.map((c) => c.id === id ? { ...c, ...editForm } : c));
         setEditingContactId(null);
@@ -131,7 +126,7 @@ export function DistributorDetail({
       return;
     }
     startTransition(async () => {
-      const result = await deleteDistributorContact(id);
+      const result = await deleteDistributorContact(id, distributor.id);
       if (result?.success) setContacts((prev) => prev.filter((c) => c.id !== id));
     });
   }
@@ -226,9 +221,7 @@ export function DistributorDetail({
     });
   }
 
-  // ── 프로젝트 helpers & handlers ──────────────────────
-  const linkedProjectIds = useMemo(() => new Set(projects.map((p) => p.id)), [projects]);
-
+  // ── 프로젝트 helpers ─────────────────────────────────
   const filteredProjects = useMemo(() => {
     const q = projectSearch.toLowerCase();
     return projects.filter(
@@ -238,35 +231,6 @@ export function DistributorDetail({
 
   const totalProjectPages = Math.ceil(filteredProjects.length / PAGE_SIZE) || 1;
   const pagedProjects = filteredProjects.slice(projectPage * PAGE_SIZE, (projectPage + 1) * PAGE_SIZE);
-
-  const availableProjects = useMemo(
-    () => allProjects.filter((p) => !linkedProjectIds.has(p.id)),
-    [allProjects, linkedProjectIds]
-  );
-
-  function handleAddProject(p: Project) {
-    startTransition(async () => {
-      const result = await addProjectToDistributor(distributor.id, p.id);
-      if (result?.success) {
-        setProjects((prev) => [...prev, p]);
-        setProjectPickerOpen(false);
-      }
-    });
-  }
-
-  function handleRemoveProject(projectId: string) {
-    startTransition(async () => {
-      const result = await removeProjectFromDistributor(distributor.id, projectId);
-      if (result?.success) {
-        setProjects((prev) => prev.filter((p) => p.id !== projectId));
-        setProjectPage((p) => {
-          const newFiltered = filteredProjects.filter((pr) => pr.id !== projectId);
-          const maxPage = Math.max(0, Math.ceil(newFiltered.length / PAGE_SIZE) - 1);
-          return Math.min(p, maxPage);
-        });
-      }
-    });
-  }
 
   // ── Render ────────────────────────────────────────────
   return (
@@ -355,7 +319,11 @@ export function DistributorDetail({
           )}
         </div>
 
-        {infoError && <p className="text-xs text-destructive">{infoError}</p>}
+        {infoError && (
+          <p className="text-xs font-medium text-destructive bg-destructive/10 px-2 py-1 rounded">
+            {infoError}
+          </p>
+        )}
         {isPendingInfo && <p className="text-xs text-muted-foreground">저장 중...</p>}
       </div>
 
@@ -588,41 +556,12 @@ export function DistributorDetail({
         )}
       </div>
 
-      {/* ── 참여 프로젝트 ─────────────────────────────────── */}
+      {/* ── 참여 프로젝트 (읽기 전용 — 스펙에서 파생) ───── */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             참여 프로젝트 ({projects.length})
           </h2>
-          <Popover open={projectPickerOpen} onOpenChange={setProjectPickerOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
-                <Plus className="h-3 w-3" /> 프로젝트 추가
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 p-0" align="end">
-              <Command>
-                <CommandInput placeholder="프로젝트 검색..." />
-                <CommandList>
-                  <CommandEmpty>검색 결과 없음</CommandEmpty>
-                  <CommandGroup>
-                    {availableProjects.map((p) => (
-                      <CommandItem
-                        key={p.id}
-                        value={`${p.project_name} ${p.project_client ?? ""} ${p.project_year ?? ""}`}
-                        onSelect={() => handleAddProject(p)}
-                      >
-                        <span>{p.project_name}</span>
-                        {p.project_year && (
-                          <span className="ml-1 text-muted-foreground text-xs">{p.project_year}</span>
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
         </div>
 
         <div className="relative mb-3">
@@ -643,19 +582,14 @@ export function DistributorDetail({
           ) : (
             <div>
               {pagedProjects.map((p) => (
-                <div key={p.id} className="flex items-center justify-between px-3 py-2.5 border-b last:border-0 hover:bg-muted/20 transition-colors group">
+                <div key={p.id} className="flex items-center justify-between px-3 py-2.5 border-b last:border-0 hover:bg-muted/20 transition-colors">
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-medium">{p.project_name}</span>
                     <span className="text-xs text-muted-foreground ml-2">{p.project_client} · {p.project_year}</span>
                   </div>
-                  <div className="flex items-center gap-1 ml-2 shrink-0">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                      <Link href={`/projects/${p.id}`}><ExternalLink className="h-3.5 w-3.5" /></Link>
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveProject(p.id)}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 ml-2 shrink-0" asChild>
+                    <Link href={`/projects/${p.id}`}><ExternalLink className="h-3.5 w-3.5" /></Link>
+                  </Button>
                 </div>
               ))}
             </div>

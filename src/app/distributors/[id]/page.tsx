@@ -6,7 +6,6 @@ import {
   getMaterialCategories,
   getRelatedProjectsForDistributor,
   getMaterials,
-  getProjects,
 } from "@/lib/data";
 import { DistributorDetail } from "@/components/distributors/DistributorDetail";
 
@@ -16,14 +15,13 @@ interface Props {
 
 export default async function DistributorDetailPage({ params }: Props) {
   const { id } = await params;
-  const [distributor, materials, relatedProjects, categories, allMaterials, allProjects, distributorTypes] =
+  const [distributor, materials, relatedProjects, categories, allMaterials, distributorTypes] =
     await Promise.all([
       getDistributorById(id),
       getMaterialsForDistributor(id),
       getRelatedProjectsForDistributor(id),
       getMaterialCategories(),
       getMaterials(),
-      getProjects(),
       getDistributorTypes(),
     ]);
   if (!distributor) notFound();
@@ -36,7 +34,6 @@ export default async function DistributorDetailPage({ params }: Props) {
       initialMaterials={materials}
       initialProjects={relatedProjects}
       allMaterials={allMaterials}
-      allProjects={allProjects}
       categoryMap={categoryMap}
       distributorTypes={distributorTypes}
     />

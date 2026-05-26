@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState, useRef } from "react";
+import { useTransition, useState, useRef, useEffect } from "react";
 import { createMaterial } from "@/lib/actions";
 import {
   Dialog,
@@ -26,7 +26,12 @@ export function AddMaterialModal({ categories }: { categories: MaterialCategory[
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+  }, [previewUrl]);
+
   function handleFileSelect(file: File, fromDrop: boolean) {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
     if (fromDrop) {
       setDroppedFile(file);
@@ -136,16 +141,16 @@ export function AddMaterialModal({ categories }: { categories: MaterialCategory[
             <Input name="material_item" placeholder="자재명 입력" required />
           </div>
 
-          {/* 마감 처리 */}
+          {/* FINISH */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">마감 처리</label>
-            <Input name="material_finish" placeholder="예: 무광" />
+            <label className="text-sm font-medium">FINISH</label>
+            <Input name="material_finish" placeholder="예: 무광 (미입력 시 -)" />
           </div>
 
-          {/* 크기 */}
+          {/* SIZE */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">크기</label>
-            <Input name="material_size" placeholder="예: 600x600mm" />
+            <label className="text-sm font-medium">SIZE</label>
+            <Input name="material_size" placeholder="예: 600x600mm (미입력 시 -)" />
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
