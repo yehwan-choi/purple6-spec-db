@@ -233,6 +233,34 @@ export async function deleteDistributorContact(id: string, distributorId: string
   return { success: true };
 }
 
+// ── 카테고리 ↔ 업체 링크 ─────────────────────────────────────────────────────
+
+export async function addCategoryToDistributor(
+  distributorId: string,
+  categoryId: string
+): Promise<ActionState> {
+  const { error } = await supabase
+    .from("distributor_category_links")
+    .upsert({ distributor_id: distributorId, category_id: categoryId });
+  if (error) return { success: false, error: error.message };
+  revalidatePath(`/distributors/${distributorId}`);
+  return { success: true };
+}
+
+export async function removeCategoryFromDistributor(
+  distributorId: string,
+  categoryId: string
+): Promise<ActionState> {
+  const { error } = await supabase
+    .from("distributor_category_links")
+    .delete()
+    .eq("distributor_id", distributorId)
+    .eq("category_id", categoryId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath(`/distributors/${distributorId}`);
+  return { success: true };
+}
+
 // ── 마감재 ↔ 업체 링크 ──────────────────────────────────────────────────────
 
 export async function addMaterialToDistributor(

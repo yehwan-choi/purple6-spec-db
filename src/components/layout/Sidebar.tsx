@@ -86,10 +86,10 @@ function CollapsibleMenu({
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [materialsOpenPref, setMaterialsOpenPref] = useState(false);
-  const [distributorsOpenPref, setDistributorsOpenPref] = useState(false);
-  const [projectsOpenPref, setProjectsOpenPref] = useState(false);
-  const [masterOpenPref, setMasterOpenPref] = useState(false);
+  const [materialsOpenPref, setMaterialsOpenPref] = useState(true);
+  const [distributorsOpenPref, setDistributorsOpenPref] = useState(true);
+  const [projectsOpenPref, setProjectsOpenPref] = useState(true);
+  const [masterOpenPref, setMasterOpenPref] = useState(true);
 
   const onMaterialsPath = pathname.startsWith("/materials") && !pathname.startsWith("/materials/categories");
   const onDistributorsPath = pathname.startsWith("/distributors") && !pathname.startsWith("/distributors/types");

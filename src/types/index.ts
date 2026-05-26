@@ -47,6 +47,11 @@ export interface MaterialDistributorLink {
   distributor_id: string;
 }
 
+export interface DistributorCategoryLink {
+  distributor_id: string;
+  category_id: string;
+}
+
 export interface Project {
   id: string;
   project_name: string;

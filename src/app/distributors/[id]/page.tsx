@@ -6,6 +6,7 @@ import {
   getMaterialCategories,
   getRelatedProjectsForDistributor,
   getMaterials,
+  getCategoriesForDistributor,
 } from "@/lib/data";
 import { DistributorDetail } from "@/components/distributors/DistributorDetail";
 
@@ -15,7 +16,7 @@ interface Props {
 
 export default async function DistributorDetailPage({ params }: Props) {
   const { id } = await params;
-  const [distributor, materials, relatedProjects, categories, allMaterials, distributorTypes] =
+  const [distributor, materials, relatedProjects, allCategories, allMaterials, distributorTypes, linkedCategories] =
     await Promise.all([
       getDistributorById(id),
       getMaterialsForDistributor(id),
@@ -23,10 +24,11 @@ export default async function DistributorDetailPage({ params }: Props) {
       getMaterialCategories(),
       getMaterials(),
       getDistributorTypes(),
+      getCategoriesForDistributor(id),
     ]);
   if (!distributor) notFound();
 
-  const categoryMap = new Map(categories.map((c) => [c.id, c]));
+  const categoryMap = new Map(allCategories.map((c) => [c.id, c]));
 
   return (
     <DistributorDetail
@@ -36,6 +38,8 @@ export default async function DistributorDetailPage({ params }: Props) {
       allMaterials={allMaterials}
       categoryMap={categoryMap}
       distributorTypes={distributorTypes}
+      initialCategories={linkedCategories}
+      allCategories={allCategories}
     />
   );
 }

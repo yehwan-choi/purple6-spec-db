@@ -22,6 +22,8 @@ import {
   deleteDistributorContact,
   addMaterialToDistributor,
   removeMaterialFromDistributor,
+  addCategoryToDistributor,
+  removeCategoryFromDistributor,
   updateDistributorInfo,
 } from "@/lib/actions";
 import type { Distributor, DistributorContact, DistributorTypeRecord, Material, MaterialCategory, Project } from "@/types";
@@ -35,6 +37,8 @@ interface Props {
   allMaterials: Material[];
   categoryMap: Map<string, MaterialCategory>;
   distributorTypes: DistributorTypeRecord[];
+  initialCategories: MaterialCategory[];
+  allCategories: MaterialCategory[];
 }
 
 export function DistributorDetail({
@@ -44,6 +48,8 @@ export function DistributorDetail({
   allMaterials,
   categoryMap,
   distributorTypes,
+  initialCategories,
+  allCategories,
 }: Props) {
   const [, startTransition] = useTransition();
   const [isPendingInfo, startInfoTransition] = useTransition();
@@ -84,6 +90,10 @@ export function DistributorDetail({
   const [addingContact, setAddingContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: "", role: "", phone: "", email: "" });
   const [pendingContactIds, setPendingContactIds] = useState<Set<string>>(new Set());
+
+  // ── 카테고리 태그 ─────────────────────────────────────
+  const [linkedCategories, setLinkedCategories] = useState<MaterialCategory[]>(initialCategories);
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
 
   // ── 마감재 ───────────────────────────────────────────
   const [materials, setMaterials] = useState<Material[]>(initialMaterials);
@@ -181,6 +191,31 @@ export function DistributorDetail({
     });
   }
 
+  // ── 카테고리 helpers & handlers ──────────────────────
+  const linkedCategoryIds = useMemo(() => new Set(linkedCategories.map((c) => c.id)), [linkedCategories]);
+
+  const availableCategories = useMemo(
+    () => allCategories.filter((c) => !linkedCategoryIds.has(c.id)),
+    [allCategories, linkedCategoryIds]
+  );
+
+  function handleAddCategory(cat: MaterialCategory) {
+    startTransition(async () => {
+      const result = await addCategoryToDistributor(distributor.id, cat.id);
+      if (result?.success) {
+        setLinkedCategories((prev) => [...prev, cat]);
+        setCategoryPickerOpen(false);
+      }
+    });
+  }
+
+  function handleRemoveCategory(categoryId: string) {
+    startTransition(async () => {
+      const result = await removeCategoryFromDistributor(distributor.id, categoryId);
+      if (result?.success) setLinkedCategories((prev) => prev.filter((c) => c.id !== categoryId));
+    });
+  }
+
   // ── 마감재 helpers & handlers ────────────────────────
   const linkedMaterialIds = useMemo(() => new Set(materials.map((m) => m.id)), [materials]);
 
@@ -251,6 +286,58 @@ export function DistributorDetail({
           </Badge>
         </div>
         <h1 className="text-3xl font-bold tracking-tight">{distributor.company_name}</h1>
+
+        {/* ── 카테고리 태그 ─────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+          {linkedCategories.map((cat) => (
+            <span
+              key={cat.id}
+              className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary"
+            >
+              {cat.category_kor}
+              <button
+                type="button"
+                onClick={() => handleRemoveCategory(cat.id)}
+                className="ml-0.5 rounded-full hover:bg-primary/20 p-0.5 transition-colors"
+                aria-label={`${cat.category_kor} 태그 제거`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          <Popover open={categoryPickerOpen} onOpenChange={setCategoryPickerOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-0.5 text-xs text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+              >
+                <Plus className="h-3 w-3" />
+                카테고리 추가
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-0" align="start">
+              <Command>
+                <CommandInput placeholder="카테고리 검색..." />
+                <CommandList>
+                  <CommandEmpty>검색 결과 없음</CommandEmpty>
+                  <CommandGroup>
+                    {availableCategories.map((cat) => (
+                      <CommandItem
+                        key={cat.id}
+                        value={`${cat.category_kor} ${cat.category_eng}`}
+                        onSelect={() => handleAddCategory(cat)}
+                      >
+                        <span>{cat.category_kor}</span>
+                        <span className="ml-1 text-muted-foreground text-xs">({cat.category_eng})</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+
         {distributor.address && (
           <p className="flex items-center gap-1.5 text-muted-foreground text-sm mt-2">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
