@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { CategoryCombobox } from "@/components/materials/CategoryCombobox";
 import { Plus, ImageIcon, ChevronsUpDown, Check } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { MaterialCategory, Distributor } from "@/types";
 
@@ -103,7 +104,7 @@ export function AddMaterialModal({ categories, distributors = [] }: Props) {
           <div className="space-y-1.5">
             <label className="text-sm font-medium">이미지</label>
             <div
-              className={`w-full aspect-video rounded-lg overflow-hidden border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center bg-muted/40 ${
+              className={`relative w-full aspect-video rounded-lg overflow-hidden border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center bg-muted/40 ${
                 isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50"
               }`}
               onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
@@ -117,7 +118,7 @@ export function AddMaterialModal({ categories, distributors = [] }: Props) {
               onClick={() => fileInputRef.current?.click()}
             >
               {previewUrl ? (
-                <img src={previewUrl} alt="미리보기" className="w-full h-full object-cover" />
+                <Image src={previewUrl} alt="미리보기" fill unoptimized className="object-cover" />
               ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground select-none">
                   <ImageIcon className="h-8 w-8 opacity-40" />

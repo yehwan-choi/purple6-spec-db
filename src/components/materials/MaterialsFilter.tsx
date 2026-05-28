@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useTransition, useRef } from "react";
+import Image from "next/image";
 import { Search, ImageIcon, Trash2, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -132,7 +133,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories, distr
       ),
       editDistributorId !== prevDistributorId
         ? updateMaterialDistributor(selected.id, editDistributorId || null)
-        : Promise.resolve({ success: true } as { success: boolean }),
+        : Promise.resolve({ success: true } as { success: boolean; error?: string }),
     ]);
 
     setSaving(false);
@@ -241,7 +242,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories, distr
                     <td className="px-3 py-2 text-center">
                       <div className="w-14 h-14 mx-auto rounded-md overflow-hidden bg-muted border flex items-center justify-center shrink-0">
                         {m.material_image ? (
-                          <img src={m.material_image} alt={m.material_item} className="w-full h-full object-cover" />
+                          <Image src={m.material_image} alt={m.material_item} width={56} height={56} unoptimized className="w-full h-full object-cover" />
                         ) : (
                           <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
                         )}
@@ -296,11 +297,11 @@ export function MaterialsFilter({ materials: initialMaterials, categories, distr
           <div className="px-6 pb-6 space-y-4">
             {/* 이미지 */}
             <div
-              className="w-full aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center border cursor-pointer hover:opacity-80 transition-opacity"
+              className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center border cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => fileInputRef.current?.click()}
             >
               {editImagePreview ? (
-                <img src={editImagePreview} alt="미리보기" className="w-full h-full object-cover" />
+                <Image src={editImagePreview} alt="미리보기" fill unoptimized className="object-cover" />
               ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <ImageIcon className="h-10 w-10 opacity-30" />
