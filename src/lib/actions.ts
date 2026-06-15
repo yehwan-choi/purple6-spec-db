@@ -485,3 +485,16 @@ export async function deleteDistributorType(id: string): Promise<ActionState> {
   revalidatePath("/distributors");
   return { success: true };
 }
+
+// ── 앱 설정(비밀번호) ─────────────────────────────────────────────────────────
+
+export async function updateAppPassword(
+  key: "purple6_password" | "admin_password",
+  value: string
+): Promise<ActionState> {
+  if (!/^\d{4}$/.test(value)) return { success: false, error: "비밀번호는 숫자 4자리여야 합니다." };
+  const { error } = await supabase.from("app_settings").upsert({ key, value });
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/");
+  return { success: true };
+}

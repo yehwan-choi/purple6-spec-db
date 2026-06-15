@@ -24,6 +24,7 @@ import {
   Volume2,
   Baseline,
   MoreHorizontal,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DistributorTypeRecord } from "@/types";
@@ -145,7 +146,10 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
   const onMaterialDistributorsPath = pathname.startsWith("/distributors/material");
   const onProfessionalPath = pathname.startsWith("/distributors/other");
   const onProjectsPath = pathname.startsWith("/projects");
-  const onMasterPath = pathname.startsWith("/materials/categories") || pathname.startsWith("/distributors/types");
+  const onMasterPath =
+    pathname.startsWith("/materials/categories") ||
+    pathname.startsWith("/distributors/types") ||
+    pathname.startsWith("/settings/passwords");
 
   const professionalOpen = professionalOpenPref || onProfessionalPath;
   const projectsOpen = projectsOpenPref || onProjectsPath;
@@ -166,6 +170,7 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
   const masterSubItems = [
     { label: "카테고리 관리", href: "/materials/categories", icon: Tag },
     { label: "업체 구분 관리", href: "/distributors/types", icon: Building2 },
+    { label: "비밀번호 관리", href: "/settings/passwords", icon: KeyRound },
   ];
 
   return (

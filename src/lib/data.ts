@@ -180,3 +180,16 @@ export async function getRelatedProjectsForDistributor(distributorId: string): P
     return true;
   });
 }
+
+export async function getAppSettings(): Promise<{ purple6_password: string; admin_password: string }> {
+  const { data, error } = await supabase
+    .from("app_settings")
+    .select("key, value")
+    .in("key", ["purple6_password", "admin_password"]);
+  if (error || !data) return { purple6_password: "6666", admin_password: "1234" };
+  const map = Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, r.value]));
+  return {
+    purple6_password: map.purple6_password ?? "6666",
+    admin_password: map.admin_password ?? "1234",
+  };
+}
