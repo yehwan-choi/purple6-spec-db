@@ -15,6 +15,7 @@ import {
 import { Trash2, Search, Pencil } from "lucide-react";
 import { deleteProject } from "@/lib/actions";
 import type { Project } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 type SortKey = "project_name" | "project_client" | "project_year";
 type SortDir = "asc" | "desc";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function ProjectsList({ projects: initialProjects }: Props) {
+  const canWrite = useCanWrite();
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -159,7 +161,7 @@ export function ProjectsList({ projects: initialProjects }: Props) {
                     size="icon"
                     className="h-7 w-7 text-muted-foreground hover:text-destructive"
                     onClick={() => handleDelete(project.id)}
-                    disabled={deletingId === project.id}
+                    disabled={!canWrite || deletingId === project.id}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

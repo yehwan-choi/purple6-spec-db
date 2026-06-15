@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { deleteDistributor } from "@/lib/actions";
 import { AddDistributorModal } from "@/components/distributors/AddDistributorModal";
 import type { Distributor, DistributorTypeRecord, MaterialCategory } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 type SortKey = "company_name" | "contacts";
 type SortDir = "asc" | "desc";
@@ -34,6 +35,7 @@ export function DistributorsFilter({
   categoryLinkMap = new Map(),
   allCategories = [],
 }: Props) {
+  const canWrite = useCanWrite();
   const [distributors, setDistributors] = useState<Distributor[]>(initialDistributors);
   const [activeTab, setActiveTab] = useState<string>(defaultType ?? distributorTypes[0]?.id ?? "");
   const [search, setSearch] = useState("");
@@ -250,7 +252,7 @@ export function DistributorsFilter({
                       size="icon"
                       className="h-7 w-7 text-muted-foreground hover:text-destructive"
                       onClick={() => handleDelete(v.id)}
-                      disabled={deletingId === v.id}
+                      disabled={!canWrite || deletingId === v.id}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

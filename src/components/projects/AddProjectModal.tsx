@@ -12,8 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 export function AddProjectModal() {
+  const canWrite = useCanWrite();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -33,7 +35,7 @@ export function AddProjectModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2" disabled={!canWrite}>
           <Plus className="h-4 w-4" />
           프로젝트 생성
         </Button>

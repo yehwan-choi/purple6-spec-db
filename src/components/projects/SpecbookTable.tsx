@@ -6,6 +6,7 @@ import { Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteProjectSpec } from "@/lib/actions";
 import { AddSpecModal } from "./AddSpecModal";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 import { EditSpecModal } from "./EditSpecModal";
 import type {
   ProjectSpec,
@@ -37,6 +38,7 @@ export function SpecbookTable({
   categories,
   distributors,
 }: Props) {
+  const canWrite = useCanWrite();
   const router = useRouter();
   const [deletedIds, setDeletedIds] = useState(new Set<string>());
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export function SpecbookTable({
 
   return (
     <div>
-      {isDraft && (
+      {isDraft && canWrite && (
         <div className="flex justify-end mb-4">
           <AddSpecModal
             projectId={projectId}
@@ -136,6 +138,7 @@ export function SpecbookTable({
                         size="icon"
                         className="h-7 w-7 text-muted-foreground hover:text-foreground"
                         onClick={() => setEditingSpec(item)}
+                        disabled={!canWrite}
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
@@ -147,7 +150,7 @@ export function SpecbookTable({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-destructive"
                           onClick={() => handleDelete(item.id)}
-                          disabled={deletingId === item.id}
+                          disabled={!canWrite || deletingId === item.id}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>

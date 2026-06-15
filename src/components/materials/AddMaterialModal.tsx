@@ -18,6 +18,7 @@ import { Plus, ImageIcon, ChevronsUpDown, Check } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { MaterialCategory, Distributor } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 interface Props {
   categories: MaterialCategory[];
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function AddMaterialModal({ categories, distributors = [] }: Props) {
+  const canWrite = useCanWrite();
   const [open, setOpen] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [selectedDistributor, setSelectedDistributor] = useState("");
@@ -90,7 +92,7 @@ export function AddMaterialModal({ categories, distributors = [] }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2" disabled={!canWrite}>
           <Plus className="h-4 w-4" />
           자재 등록
         </Button>

@@ -6,12 +6,14 @@ import { CheckCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateProjectStatus } from "@/lib/actions";
 import type { Project } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 interface Props {
   project: Pick<Project, "id" | "status">;
 }
 
 export function ProjectStatusToggle({ project }: Props) {
+  const canWrite = useCanWrite();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export function ProjectStatusToggle({ project }: Props) {
         size="sm"
         className="gap-2"
         onClick={handleToggle}
-        disabled={isPending}
+        disabled={!canWrite || isPending}
       >
         {isDraft ? (
           <>

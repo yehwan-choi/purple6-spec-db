@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DistributorTypeRecord } from "@/types";
+import { useRole } from "@/components/auth/RoleProvider";
 
 const PROFESSIONAL_ICONS: Record<string, React.ElementType> = {
   조명: Lightbulb,
@@ -136,6 +137,7 @@ function CollapsibleMenu({
 
 export function Sidebar({ professionalTypes = [] }: { professionalTypes?: DistributorTypeRecord[] }) {
   const pathname = usePathname();
+  const { role } = useRole();
   const [professionalOpenPref, setProfessionalOpenPref] = useState(true);
   const [projectsOpenPref, setProjectsOpenPref] = useState(true);
   const [masterOpenPref, setMasterOpenPref] = useState(true);
@@ -202,18 +204,20 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
         />
       </nav>
 
-      {/* 기준정보 관리 — 하단 고정 */}
-      <div className="border-t px-3 py-3">
-        <CollapsibleMenu
-          icon={Settings2}
-          label="기준정보 관리"
-          isActive={onMasterPath}
-          isOpen={masterOpen}
-          onToggle={() => setMasterOpenPref((v) => !v)}
-          subItems={masterSubItems}
-          pathname={pathname}
-        />
-      </div>
+      {/* 기준정보 관리 — ADMIN 전용, 하단 고정 */}
+      {role === "ADMIN" && (
+        <div className="border-t px-3 py-3">
+          <CollapsibleMenu
+            icon={Settings2}
+            label="기준정보 관리"
+            isActive={onMasterPath}
+            isOpen={masterOpen}
+            onToggle={() => setMasterOpenPref((v) => !v)}
+            subItems={masterSubItems}
+            pathname={pathname}
+          />
+        </div>
+      )}
     </aside>
   );
 }

@@ -24,6 +24,7 @@ import { Plus, Trash2, Tag, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "@/components/ui/phone-input";
 import type { Distributor, DistributorContact, DistributorTypeRecord, MaterialCategory } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 interface ContactRow {
   name: string;
@@ -41,6 +42,7 @@ interface Props {
 }
 
 export function AddDistributorModal({ onSuccess, defaultType, lockType, distributorTypes, allCategories = [] }: Props) {
+  const canWrite = useCanWrite();
   const [open, setOpen] = useState(false);
   const [distributorType, setDistributorType] = useState<string>(defaultType ?? "");
   const [contacts, setContacts] = useState<ContactRow[]>([{ name: "", role: "", phone: "", email: "" }]);
@@ -113,7 +115,7 @@ export function AddDistributorModal({ onSuccess, defaultType, lockType, distribu
   return (
     <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) resetForm(); }}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2" disabled={!canWrite}>
           <Plus className="h-4 w-4" />
           업체 등록
         </Button>

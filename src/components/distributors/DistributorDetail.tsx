@@ -27,6 +27,7 @@ import {
   updateDistributorInfo,
 } from "@/lib/actions";
 import type { Distributor, DistributorContact, DistributorTypeRecord, Material, MaterialCategory, Project } from "@/types";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 
 const PAGE_SIZE = 5;
 
@@ -51,6 +52,7 @@ export function DistributorDetail({
   initialCategories,
   allCategories,
 }: Props) {
+  const canWrite = useCanWrite();
   const [, startTransition] = useTransition();
   const [isPendingInfo, startInfoTransition] = useTransition();
 
@@ -298,7 +300,8 @@ export function DistributorDetail({
               <button
                 type="button"
                 onClick={() => handleRemoveCategory(cat.id)}
-                className="ml-0.5 rounded-full hover:bg-primary/20 p-0.5 transition-colors"
+                disabled={!canWrite}
+                className="ml-0.5 rounded-full hover:bg-primary/20 p-0.5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label={`${cat.category_kor} 태그 제거`}
               >
                 <X className="h-3 w-3" />
@@ -309,7 +312,8 @@ export function DistributorDetail({
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-0.5 text-xs text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+                disabled={!canWrite}
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-0.5 text-xs text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <Plus className="h-3 w-3" />
                 카테고리 추가
@@ -351,7 +355,7 @@ export function DistributorDetail({
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">정보</h2>
           {!editingInfo ? (
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={startEditInfo}>
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={startEditInfo} disabled={!canWrite}>
               <Pencil className="h-3.5 w-3.5" />
             </Button>
           ) : (
@@ -422,7 +426,7 @@ export function DistributorDetail({
           </h2>
           <div className="flex gap-2">
             {!addingContact ? (
-              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAddingContact(true)}>
+              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAddingContact(true)} disabled={!canWrite}>
                 <Plus className="h-3 w-3" /> 담당자 추가
               </Button>
             ) : (
@@ -493,10 +497,10 @@ export function DistributorDetail({
                           </>
                         ) : (
                           <>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => startEditContact(c)}>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => startEditContact(c)} disabled={!canWrite}>
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteContact(c.id)}>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteContact(c.id)} disabled={!canWrite}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </>
@@ -546,7 +550,7 @@ export function DistributorDetail({
           </h2>
           <Popover open={materialPickerOpen} onOpenChange={setMaterialPickerOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
+              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" disabled={!canWrite}>
                 <Plus className="h-3 w-3" /> 마감재 추가
               </Button>
             </PopoverTrigger>
@@ -615,7 +619,7 @@ export function DistributorDetail({
                           <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                             <Link href={`/materials/${m.id}`}><ExternalLink className="h-3.5 w-3.5" /></Link>
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveMaterial(m.id)}>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveMaterial(m.id)} disabled={!canWrite}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>

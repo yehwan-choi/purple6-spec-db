@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { deleteMaterial, updateMaterial, updateMaterialDistributor } from "@/lib/actions";
+import { useCanWrite } from "@/components/auth/RoleProvider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { ChevronsUpDown, Check } from "lucide-react";
@@ -37,6 +38,7 @@ interface Props {
 }
 
 export function MaterialsFilter({ materials: initialMaterials, categories, distributorLinkMap = new Map(), distributors = [] }: Props) {
+  const canWrite = useCanWrite();
   const [materials, setMaterials] = useState<Material[]>(initialMaterials);
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
@@ -265,7 +267,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories, distr
                     <td className="px-4 py-2 text-sm text-muted-foreground text-center">{m.material_finish || "-"}</td>
                     <td className="px-4 py-2 text-xs text-muted-foreground font-mono text-center">{m.material_size || "-"}</td>
                     <td className="px-4 py-2 text-center">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => openEdit(m)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => openEdit(m)} disabled={!canWrite}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                     </td>
@@ -275,7 +277,7 @@ export function MaterialsFilter({ materials: initialMaterials, categories, distr
                         size="icon"
                         className="h-7 w-7 text-muted-foreground hover:text-destructive"
                         onClick={() => handleDelete(m.id)}
-                        disabled={deletingId === m.id}
+                        disabled={!canWrite || deletingId === m.id}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
