@@ -22,12 +22,14 @@ interface Props {
   lockModal?: boolean;
   categoryLinkMap?: Map<string, MaterialCategory[]>;
   allCategories?: MaterialCategory[];
+  pageTitle?: string;
 }
 
 export function DistributorsFilter({
   distributors: initialDistributors,
   distributorTypes,
   defaultType,
+  pageTitle,
   lockModal = false,
   categoryLinkMap = new Map(),
   allCategories = [],
@@ -108,7 +110,7 @@ export function DistributorsFilter({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">업체</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{pageTitle ?? "업체"}</h1>
           <p className="text-muted-foreground mt-1">자재 공급 및 시공 협력 업체 관리</p>
         </div>
         <AddDistributorModal

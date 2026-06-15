@@ -136,7 +136,6 @@ function CollapsibleMenu({
 
 export function Sidebar({ professionalTypes = [] }: { professionalTypes?: DistributorTypeRecord[] }) {
   const pathname = usePathname();
-  const [materialsOpenPref, setMaterialsOpenPref] = useState(true);
   const [professionalOpenPref, setProfessionalOpenPref] = useState(true);
   const [projectsOpenPref, setProjectsOpenPref] = useState(true);
   const [masterOpenPref, setMasterOpenPref] = useState(true);
@@ -147,14 +146,9 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
   const onProjectsPath = pathname.startsWith("/projects");
   const onMasterPath = pathname.startsWith("/materials/categories") || pathname.startsWith("/distributors/types");
 
-  const materialsOpen = materialsOpenPref || onMaterialsPath;
   const professionalOpen = professionalOpenPref || onProfessionalPath;
   const projectsOpen = projectsOpenPref || onProjectsPath;
   const masterOpen = masterOpenPref || onMasterPath;
-
-  const materialSubItems = [
-    { label: "마감재 라이브러리", href: "/materials", icon: Package, exact: true },
-  ];
 
   const professionalSubItems = professionalTypes.map((t) => ({
     label: t.label_kor,
@@ -176,14 +170,11 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
   return (
     <aside className="sticky top-14 h-[calc(100vh-56px)] w-72 shrink-0 border-r bg-card flex flex-col">
       <nav className="flex-1 px-3 py-4 space-y-1">
-        <CollapsibleMenu
+        <NavLink
           icon={Layers}
           label="마감재 라이브러리"
+          href="/materials"
           isActive={onMaterialsPath}
-          isOpen={materialsOpen}
-          onToggle={() => setMaterialsOpenPref((v) => !v)}
-          subItems={materialSubItems}
-          pathname={pathname}
         />
         <NavLink
           icon={UserSearch}
@@ -202,7 +193,7 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
         />
         <CollapsibleMenu
           icon={FolderOpen}
-          label="프로젝트 SPEC 관리"
+          label="SPEC BOOK 관리(준비중)"
           isActive={onProjectsPath}
           isOpen={projectsOpen}
           onToggle={() => setProjectsOpenPref((v) => !v)}

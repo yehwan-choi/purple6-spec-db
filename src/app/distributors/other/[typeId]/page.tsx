@@ -47,6 +47,7 @@ export default async function OtherDistributorTypePage({ params }: Props) {
         lockModal={false}
         categoryLinkMap={categoryLinkMap}
         allCategories={allCategories}
+        pageTitle={currentType.label_kor}
       />
     </div>
   );

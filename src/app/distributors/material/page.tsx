@@ -29,6 +29,7 @@ export default async function MaterialDistributorsPage() {
         lockModal={true}
         categoryLinkMap={categoryLinkMap}
         allCategories={allCategories}
+        pageTitle="마감재 업체"
       />
     </div>
   );
