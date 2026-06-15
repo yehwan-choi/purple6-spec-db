@@ -17,6 +17,7 @@ import {
   Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { DistributorTypeRecord } from "@/types";
 
 function CollapsibleMenu({
   icon: Icon,
@@ -84,7 +85,7 @@ function CollapsibleMenu({
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ professionalTypes = [] }: { professionalTypes?: DistributorTypeRecord[] }) {
   const pathname = usePathname();
   const [materialsOpenPref, setMaterialsOpenPref] = useState(true);
   const [distributorsOpenPref, setDistributorsOpenPref] = useState(true);
@@ -107,7 +108,12 @@ export function Sidebar() {
 
   const distributorSubItems = [
     { label: "마감재 업체", href: "/distributors/material", icon: Truck },
-    { label: "기타 업체", href: "/distributors/other", icon: Wrench },
+    ...professionalTypes.map((t) => ({
+      label: t.label_kor,
+      href: `/distributors/other/${t.id}`,
+      icon: Wrench,
+      exact: true,
+    })),
   ];
 
   const projectSubItems = [
@@ -134,7 +140,7 @@ export function Sidebar() {
         />
         <CollapsibleMenu
           icon={Building2}
-          label="업체 DB"
+          label="전문 업체"
           isActive={onDistributorsPath}
           isOpen={distributorsOpen}
           onToggle={() => setDistributorsOpenPref((v) => !v)}

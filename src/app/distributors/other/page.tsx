@@ -1,35 +1,15 @@
-import { getDistributors, getDistributorTypes, getAllDistributorCategoryLinks, getMaterialCategories } from "@/lib/data";
-import { DistributorsFilter } from "@/components/distributors/DistributorsFilter";
-import type { MaterialCategory } from "@/types";
+import { redirect } from "next/navigation";
+import { getDistributorTypes } from "@/lib/data";
 
-export const metadata = { title: "기타 업체 | 마감재 DB" };
+export const metadata = { title: "전문 업체 | 마감재 DB" };
 
 export default async function OtherDistributorsPage() {
-  const [allDistributors, allTypes, categoryLinks, allCategories] = await Promise.all([
-    getDistributors(),
-    getDistributorTypes(),
-    getAllDistributorCategoryLinks(),
-    getMaterialCategories(),
-  ]);
-  const visibleTypes = allTypes.filter((t) => !t.is_material);
-  const defaultType = visibleTypes[0]?.id ?? "other";
-
-  const categoryLinkMap = new Map<string, MaterialCategory[]>();
-  for (const link of categoryLinks) {
-    if (!categoryLinkMap.has(link.distributor_id)) categoryLinkMap.set(link.distributor_id, []);
-    categoryLinkMap.get(link.distributor_id)!.push(link.category);
-  }
-
+  const types = await getDistributorTypes();
+  const first = types.find((t) => !t.is_material);
+  if (first) redirect(`/distributors/other/${first.id}`);
   return (
-    <div className="p-8">
-      <DistributorsFilter
-        distributors={allDistributors}
-        distributorTypes={visibleTypes}
-        defaultType={defaultType}
-        lockModal={false}
-        categoryLinkMap={categoryLinkMap}
-        allCategories={allCategories}
-      />
+    <div className="p-8 text-muted-foreground text-sm">
+      등록된 전문 업체 구분이 없습니다.
     </div>
   );
 }
