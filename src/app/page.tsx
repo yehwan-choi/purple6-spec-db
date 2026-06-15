@@ -15,9 +15,9 @@ export default async function HomePage() {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">HOME</h1>
-        <p className="text-muted-foreground mt-1">인테리어 마감재 &amp; 업체 등록 현황</p>
+      <div className="mb-8 rounded-xl px-6 py-5" style={{ backgroundColor: "#00001a" }}>
+        <h1 className="text-2xl font-bold tracking-tight text-white">HOME</h1>
+        <p className="text-white/50 mt-1">인테리어 마감재 &amp; 업체 등록 현황</p>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
