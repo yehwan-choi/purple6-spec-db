@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -58,15 +59,21 @@ export function DistributorDetail({
 
   const isMaterial = distributorTypes.find((t) => t.id === distributor.distributor_type)?.is_material ?? false;
 
-  // ── 비고 / 홈페이지 ──────────────────────────────────
+  // ── 업체명 / 구분 / 비고 / 홈페이지 ─────────────────
+  const [companyName, setCompanyName] = useState(distributor.company_name);
+  const [distributorTypeId, setDistributorTypeId] = useState(distributor.distributor_type);
   const [note, setNote] = useState(distributor.note ?? "");
   const [homepage, setHomepage] = useState(distributor.homepage ?? "");
   const [editingInfo, setEditingInfo] = useState(false);
+  const [companyNameInput, setCompanyNameInput] = useState("");
+  const [distributorTypeInput, setDistributorTypeInput] = useState("");
   const [noteInput, setNoteInput] = useState("");
   const [homepageInput, setHomepageInput] = useState("");
   const [infoError, setInfoError] = useState<string | null>(null);
 
   function startEditInfo() {
+    setCompanyNameInput(companyName);
+    setDistributorTypeInput(distributorTypeId);
     setNoteInput(note);
     setHomepageInput(homepage);
     setInfoError(null);
@@ -76,8 +83,15 @@ export function DistributorDetail({
   function handleSaveInfo() {
     setInfoError(null);
     startInfoTransition(async () => {
-      const result = await updateDistributorInfo(distributor.id, { note: noteInput, homepage: homepageInput });
+      const result = await updateDistributorInfo(distributor.id, {
+        company_name: companyNameInput,
+        distributor_type: distributorTypeInput,
+        note: noteInput,
+        homepage: homepageInput,
+      });
       if (result?.success) {
+        setCompanyName(companyNameInput);
+        setDistributorTypeId(distributorTypeInput);
         setNote(noteInput);
         setHomepage(homepageInput);
         setEditingInfo(false);
@@ -286,10 +300,10 @@ export function DistributorDetail({
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Badge variant="outline">
-            {distributorTypes.find((t) => t.id === distributor.distributor_type)?.label_kor ?? distributor.distributor_type}
+            {distributorTypes.find((t) => t.id === distributorTypeId)?.label_kor ?? distributorTypeId}
           </Badge>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">{distributor.company_name}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{companyName}</h1>
 
         {/* ── 카테고리 태그 (마감재 업체만) ─────────────── */}
         {isMaterial && <div className="flex flex-wrap items-center gap-1.5 mt-3">
@@ -369,6 +383,42 @@ export function DistributorDetail({
                 <X className="h-3.5 w-3.5" />
               </Button>
             </div>
+          )}
+        </div>
+
+        {/* 업체명 */}
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">업체명</label>
+          {editingInfo ? (
+            <Input
+              value={companyNameInput}
+              onChange={(e) => setCompanyNameInput(e.target.value)}
+              placeholder="업체명 입력"
+              className="h-8 text-sm"
+            />
+          ) : (
+            <p className="text-sm font-medium">{companyName}</p>
+          )}
+        </div>
+
+        {/* 업체 구분 */}
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">업체 구분</label>
+          {editingInfo ? (
+            <Select value={distributorTypeInput} onValueChange={setDistributorTypeInput}>
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="구분 선택" />
+              </SelectTrigger>
+              <SelectContent>
+                {distributorTypes.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.label_kor}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {distributorTypes.find((t) => t.id === distributorTypeId)?.label_kor ?? distributorTypeId}
+            </p>
           )}
         </div>
 

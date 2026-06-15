@@ -172,11 +172,17 @@ export async function deleteDistributor(id: string): Promise<ActionState> {
 
 export async function updateDistributorInfo(
   id: string,
-  data: { note: string; homepage: string }
+  data: { company_name: string; distributor_type: string; note: string; homepage: string }
 ): Promise<ActionState> {
+  if (!data.company_name.trim()) return { success: false, error: "업체명을 입력해 주세요." };
   const { error } = await supabase
     .from("distributors")
-    .update({ note: data.note || null, homepage: data.homepage || null })
+    .update({
+      company_name: data.company_name.trim(),
+      distributor_type: data.distributor_type,
+      note: data.note || null,
+      homepage: data.homepage || null,
+    })
     .eq("id", id);
   if (error) return { success: false, error: error.message };
 
