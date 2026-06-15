@@ -10,14 +10,63 @@ import {
   ChevronDown,
   Tag,
   Package,
-  Truck,
+  UserSearch,
+  UserStar,
   Wrench,
   Settings2,
   FilePlus,
   Archive,
+  Lightbulb,
+  Toilet,
+  Bolt,
+  ShelvingUnit,
+  Armchair,
+  Leaf,
+  Volume2,
+  Baseline,
+  MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DistributorTypeRecord } from "@/types";
+
+const PROFESSIONAL_ICONS: Record<string, React.ElementType> = {
+  조명: Lightbulb,
+  위생도기: Toilet,
+  하드웨어: Bolt,
+  제작가구: ShelvingUnit,
+  이동가구: Armchair,
+  조경: Leaf,
+  "AV/음향": Volume2,
+  사인: Baseline,
+  기타: MoreHorizontal,
+};
+
+function NavLink({
+  icon: Icon,
+  label,
+  href,
+  isActive,
+}: {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  isActive: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span className="font-medium whitespace-nowrap">{label}</span>
+    </Link>
+  );
+}
 
 function CollapsibleMenu({
   icon: Icon,
@@ -88,17 +137,18 @@ function CollapsibleMenu({
 export function Sidebar({ professionalTypes = [] }: { professionalTypes?: DistributorTypeRecord[] }) {
   const pathname = usePathname();
   const [materialsOpenPref, setMaterialsOpenPref] = useState(true);
-  const [distributorsOpenPref, setDistributorsOpenPref] = useState(true);
+  const [professionalOpenPref, setProfessionalOpenPref] = useState(true);
   const [projectsOpenPref, setProjectsOpenPref] = useState(true);
   const [masterOpenPref, setMasterOpenPref] = useState(true);
 
   const onMaterialsPath = pathname.startsWith("/materials") && !pathname.startsWith("/materials/categories");
-  const onDistributorsPath = pathname.startsWith("/distributors") && !pathname.startsWith("/distributors/types");
+  const onMaterialDistributorsPath = pathname.startsWith("/distributors/material");
+  const onProfessionalPath = pathname.startsWith("/distributors/other");
   const onProjectsPath = pathname.startsWith("/projects");
   const onMasterPath = pathname.startsWith("/materials/categories") || pathname.startsWith("/distributors/types");
 
   const materialsOpen = materialsOpenPref || onMaterialsPath;
-  const distributorsOpen = distributorsOpenPref || onDistributorsPath;
+  const professionalOpen = professionalOpenPref || onProfessionalPath;
   const projectsOpen = projectsOpenPref || onProjectsPath;
   const masterOpen = masterOpenPref || onMasterPath;
 
@@ -106,15 +156,12 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
     { label: "마감재 라이브러리", href: "/materials", icon: Package, exact: true },
   ];
 
-  const distributorSubItems = [
-    { label: "마감재 업체", href: "/distributors/material", icon: Truck },
-    ...professionalTypes.map((t) => ({
-      label: t.label_kor,
-      href: `/distributors/other/${t.id}`,
-      icon: Wrench,
-      exact: true,
-    })),
-  ];
+  const professionalSubItems = professionalTypes.map((t) => ({
+    label: t.label_kor,
+    href: `/distributors/other/${t.id}`,
+    icon: PROFESSIONAL_ICONS[t.label_kor] ?? Wrench,
+    exact: true,
+  }));
 
   const projectSubItems = [
     { label: "신규 프로젝트 SPEC 작성", href: "/projects/draft", icon: FilePlus },
@@ -131,20 +178,26 @@ export function Sidebar({ professionalTypes = [] }: { professionalTypes?: Distri
       <nav className="flex-1 px-3 py-4 space-y-1">
         <CollapsibleMenu
           icon={Layers}
-          label="마감재 DB"
+          label="마감재 라이브러리"
           isActive={onMaterialsPath}
           isOpen={materialsOpen}
           onToggle={() => setMaterialsOpenPref((v) => !v)}
           subItems={materialSubItems}
           pathname={pathname}
         />
+        <NavLink
+          icon={UserSearch}
+          label="마감재 업체"
+          href="/distributors/material"
+          isActive={onMaterialDistributorsPath}
+        />
         <CollapsibleMenu
-          icon={Building2}
+          icon={UserStar}
           label="전문 업체"
-          isActive={onDistributorsPath}
-          isOpen={distributorsOpen}
-          onToggle={() => setDistributorsOpenPref((v) => !v)}
-          subItems={distributorSubItems}
+          isActive={onProfessionalPath}
+          isOpen={professionalOpen}
+          onToggle={() => setProfessionalOpenPref((v) => !v)}
+          subItems={professionalSubItems}
           pathname={pathname}
         />
         <CollapsibleMenu
