@@ -56,6 +56,8 @@ export function DistributorDetail({
   const [, startTransition] = useTransition();
   const [isPendingInfo, startInfoTransition] = useTransition();
 
+  const isMaterial = distributorTypes.find((t) => t.id === distributor.distributor_type)?.is_material ?? false;
+
   // ── 비고 / 홈페이지 ──────────────────────────────────
   const [note, setNote] = useState(distributor.note ?? "");
   const [homepage, setHomepage] = useState(distributor.homepage ?? "");
@@ -289,8 +291,8 @@ export function DistributorDetail({
         </div>
         <h1 className="text-3xl font-bold tracking-tight">{distributor.company_name}</h1>
 
-        {/* ── 카테고리 태그 ─────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+        {/* ── 카테고리 태그 (마감재 업체만) ─────────────── */}
+        {isMaterial && <div className="flex flex-wrap items-center gap-1.5 mt-3">
           {linkedCategories.map((cat) => (
             <span
               key={cat.id}
@@ -340,7 +342,7 @@ export function DistributorDetail({
               </Command>
             </PopoverContent>
           </Popover>
-        </div>
+        </div>}
 
         {distributor.address && (
           <p className="flex items-center gap-1.5 text-muted-foreground text-sm mt-2">
