@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { ParticlesBackground } from "./ParticlesBackground";
 
 export type Role = "PURPLE6" | "GUEST" | "ADMIN";
 
@@ -38,30 +39,31 @@ function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-sm space-y-10 px-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-[#00001a]">
+      <ParticlesBackground />
+      <div className="relative z-10 w-full max-w-sm space-y-10 px-6">
         {/* 앱 타이틀 */}
         <div className="text-center space-y-1">
-          <p className="text-xs font-semibold tracking-widest text-primary uppercase">Purple6</p>
-          <h1 className="text-2xl font-bold tracking-tight">마감재 & 업체 통합 관리</h1>
-          <p className="text-sm text-muted-foreground">계속하려면 역할을 선택하세요</p>
+          <p className="text-xs font-semibold tracking-widest text-purple-400 uppercase">Purple6</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">마감재 & 업체 통합 관리</h1>
+          <p className="text-sm text-white/50">계속하려면 역할을 선택하세요</p>
         </div>
 
         {/* 역할 선택 */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => onSelect("PURPLE6")}
-            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary/30 bg-primary/5 px-4 py-6 hover:border-primary hover:bg-primary/10 transition-colors group"
+            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-purple-500/40 bg-purple-500/10 px-4 py-6 hover:border-purple-400 hover:bg-purple-500/20 transition-colors group"
           >
-            <span className="text-base font-bold text-primary">PURPLE6</span>
-            <span className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors">퍼플식스 구성원</span>
+            <span className="text-base font-bold text-purple-300">PURPLE6</span>
+            <span className="text-xs text-white/50 group-hover:text-purple-300/70 transition-colors">퍼플식스 구성원</span>
           </button>
           <button
             onClick={() => onSelect("GUEST")}
-            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border px-4 py-6 hover:border-foreground/40 hover:bg-accent transition-colors"
+            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-white/20 bg-white/5 px-4 py-6 hover:border-white/40 hover:bg-white/10 transition-colors"
           >
-            <span className="text-base font-bold">GUEST</span>
-            <span className="text-xs text-muted-foreground">방문자</span>
+            <span className="text-base font-bold text-white">GUEST</span>
+            <span className="text-xs text-white/50">방문자</span>
           </button>
         </div>
 
@@ -70,7 +72,7 @@ function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
           {!showAdmin ? (
             <button
               onClick={() => setShowAdmin(true)}
-              className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              className="text-xs text-white/20 hover:text-white/50 transition-colors"
             >
               ADMIN
             </button>
@@ -84,11 +86,11 @@ function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
                   onKeyDown={(e) => e.key === "Enter" && handleAdmin()}
                   placeholder="비밀번호"
                   autoFocus
-                  className="flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="flex-1 rounded-md border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-purple-400"
                 />
                 <button
                   onClick={handleAdmin}
-                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 transition-colors"
                 >
                   확인
                 </button>
