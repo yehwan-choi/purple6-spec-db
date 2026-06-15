@@ -9,7 +9,6 @@ import {
   FolderOpen,
   ChevronDown,
   Tag,
-  Package,
   UserSearch,
   UserStar,
   Wrench,

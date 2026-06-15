@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 export type Role = "PURPLE6" | "GUEST" | "ADMIN";
 
@@ -104,22 +104,9 @@ function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [role, setRoleState] = useState<Role | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   function setRole(r: Role) {
     setRoleState(r);
-  }
-
-  if (!loaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-sm text-muted-foreground animate-pulse">로딩 중...</div>
-      </div>
-    );
   }
 
   return (
