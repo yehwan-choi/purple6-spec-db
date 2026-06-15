@@ -105,6 +105,8 @@ export function DistributorsFilter({
     });
   }, [filtered, sortKey, sortDir]);
 
+  const showCategories = distributorTypes.some((t) => t.is_material);
+
   const thClass = "flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
 
   return (
@@ -162,7 +164,7 @@ export function DistributorsFilter({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        {availableCategories.length > 0 && (
+        {showCategories && availableCategories.length > 0 && (
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-40 h-9 text-sm">
               <SelectValue placeholder="카테고리" />
@@ -188,9 +190,11 @@ export function DistributorsFilter({
                   업체명 <SortIcon active={sortKey === "company_name"} dir={sortDir} />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left">
-                <span className="text-xs font-medium text-muted-foreground">카테고리</span>
-              </th>
+              {showCategories && (
+                <th className="px-4 py-3 text-left">
+                  <span className="text-xs font-medium text-muted-foreground">카테고리</span>
+                </th>
+              )}
               <th className="px-4 py-3 text-left">
                 <span className="text-xs font-medium text-muted-foreground">비고</span>
               </th>
@@ -206,7 +210,7 @@ export function DistributorsFilter({
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-16 text-muted-foreground">
+                <td colSpan={showCategories ? 6 : 5} className="text-center py-16 text-muted-foreground">
                   {search ? "검색 결과가 없습니다." : "등록된 업체가 없습니다."}
                 </td>
               </tr>
@@ -216,22 +220,24 @@ export function DistributorsFilter({
                   <td className="px-4 py-3">
                     <span className="font-medium">{v.company_name}</span>
                   </td>
-                  <td className="px-4 py-3 max-w-[200px]">
-                    {(categoryLinkMap.get(v.id) ?? []).length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {(categoryLinkMap.get(v.id) ?? []).map((cat) => (
-                          <span
-                            key={cat.id}
-                            className="inline-block rounded-full border border-primary/30 bg-primary/5 px-2 py-px text-[10px] font-medium text-primary"
-                          >
-                            {cat.category_kor}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
-                  </td>
+                  {showCategories && (
+                    <td className="px-4 py-3 max-w-[200px]">
+                      {(categoryLinkMap.get(v.id) ?? []).length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {(categoryLinkMap.get(v.id) ?? []).map((cat) => (
+                            <span
+                              key={cat.id}
+                              className="inline-block rounded-full border border-primary/30 bg-primary/5 px-2 py-px text-[10px] font-medium text-primary"
+                            >
+                              {cat.category_kor}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-4 py-3 text-muted-foreground text-xs max-w-xs">
                     <span className="line-clamp-2">{v.note || "-"}</span>
                   </td>
