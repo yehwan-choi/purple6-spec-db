@@ -23,7 +23,7 @@ const NASA_OPTIONS = {
     links: { enable: false },
     move: {
       enable: true,
-      speed: 0.5,
+      speed: 2,
       direction: "none" as const,
       random: true,
       straight: false,
